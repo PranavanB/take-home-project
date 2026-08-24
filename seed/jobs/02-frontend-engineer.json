@@ -1,0 +1,27 @@
+{
+  "job_id": "e0596a50-2bf8-40ee-9ce5-0d93c7291c89",
+  "title": "Frontend Engineer",
+  "company": "Northstar Digital",
+  "summary": "Northstar Digital is looking for a frontend engineer to create clear, accessible experiences for a consumer finance product. You will develop React and TypeScript features, improve the shared design system, and test important customer journeys. The team values thoughtful interaction design, inclusive standards, dependable delivery, and close collaboration with product and design colleagues.",
+  "responsibilities": ["Build React features", "Improve design-system quality", "Test critical journeys"],
+  "required_qualifications": ["React", "TypeScript", "CSS", "Frontend testing", "ICT accessibility standards"],
+  "preferred_qualifications": ["Vite", "Playwright", "Quality Control Analysis"],
+  "minimum_education_level": "bachelors",
+  "required_skill_ids": [
+    "fd97e6ec-dfa1-5b88-9c97-d88b8948592a",
+    "867137fb-ff1b-4ca3-99f3-cb6969aa2c68",
+    "e5d1f825-60ed-4bdd-872a-e748c387f777",
+    "2f162da2-245a-5473-bb30-27d74edb3bc1",
+    "3e23db60-0c3d-498a-a6ac-ffbed0ecb033"
+  ],
+  "preferred_skill_ids": [
+    "c0af9021-d086-5500-97e8-9eba424217a2",
+    "6313f7ed-724f-5483-aba1-533af979ddcd",
+    "73a9c711-20d9-5dc8-bbe5-88d40f7845e5"
+  ],
+  "country_code": "GB",
+  "industry_id": "f1f03a9d-e384-5470-80ae-dfee81bfdeaf",
+  "location_label": "Bristol, UK",
+  "work_pattern": "Hybrid – 3 office days per week",
+  "employment_type": "Full time"
+}

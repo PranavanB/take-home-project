@@ -1,0 +1,44 @@
+{
+  "job_id": "fd623e0c-418a-4da1-9d02-26f73ebd8eaf",
+  "title": "Senior Software Engineer I – Backend",
+  "company": "Rightmove",
+  "summary": "Rightmove is seeking a senior backend engineer to develop reliable services and customer tooling for its property platform. You will work primarily with modern Java and Spring technologies, help shape technical decisions, and improve systems that serve a large UK audience. The role includes collaborative delivery, testing, mentoring, and ownership of production quality.",
+  "responsibilities": [
+    "Design and build scalable backend features",
+    "Own technical decisions and projects end to end",
+    "Mentor engineers and improve team practices"
+  ],
+  "required_qualifications": [
+    "Commercial Java and Spring Boot experience",
+    "Kafka and distributed systems",
+    "SQL and data storage",
+    "Docker-based delivery",
+    "Technical stakeholder communication"
+  ],
+  "preferred_qualifications": [
+    "Cloud platform experience",
+    "Systems analysis",
+    "Quality engineering practices"
+  ],
+  "minimum_education_level": null,
+  "required_skill_ids": [
+    "e9743453-bade-5831-bc8c-537100bbbca3",
+    "f7e2eb04-3e50-4561-bce1-7e51a1fec308",
+    "598de5b0-5b58-4ea7-8058-a4bc4d18c742",
+    "225f6f56-652c-57e6-8209-d9b5fbaa87f1",
+    "477173ca-5fc2-406b-9122-95d92811f284"
+  ],
+  "preferred_skill_ids": [
+    "bd14968e-e409-45af-b362-3495ed7b10e0",
+    "ab773a53-0e6d-5fc8-8b8f-1c1f4e3c17ca",
+    "73a9c711-20d9-5dc8-bbe5-88d40f7845e5"
+  ],
+  "country_code": "GB",
+  "industry_id": "4f944279-12fb-5817-8a88-c6cc897b7921",
+  "location_label": "London, UK",
+  "work_pattern": "Hybrid – 2 office days per week",
+  "employment_type": "Full time",
+  "salary": null,
+  "source_url": "https://job-boards.greenhouse.io/rightmovecareers/jobs/4876362101",
+  "source_checked_at": "2026-08-23"
+}

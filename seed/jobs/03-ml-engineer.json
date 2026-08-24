@@ -1,0 +1,27 @@
+{
+  "job_id": "ddf5cc98-d4dd-4f97-b8a3-c9f0f24c6626",
+  "title": "Machine Learning Engineer",
+  "company": "Vector Works",
+  "summary": "Vector Works needs a machine learning engineer to turn retrieval and language-model research into dependable product features. You will develop retrieval-augmented generation pipelines, evaluate search quality, and deploy model services used in real workflows. The position combines practical Python engineering with careful experimentation, monitoring, and collaboration across product and platform teams.",
+  "responsibilities": ["Develop RAG pipelines", "Evaluate retrieval quality", "Deploy model services"],
+  "required_qualifications": ["Python (computer programming)", "utilise machine learning", "Embeddings", "perform data analysis", "design application interfaces"],
+  "preferred_qualifications": ["PyTorch", "Vector search", "LLM serving"],
+  "minimum_education_level": "masters",
+  "required_skill_ids": [
+    "ccd0a1d9-afda-43d9-b901-96344886e14d",
+    "8369c2d6-c100-4cf6-bd83-9668d8678433",
+    "24d876b8-3326-5b43-b0cb-f71a1a468ee4",
+    "2b92a5b2-6758-4ee3-9fb4-b6387a55cc8f",
+    "b0096dc5-2e2d-4bc1-8172-05bf486c3968"
+  ],
+  "preferred_skill_ids": [
+    "e0e43608-aa8a-5e8c-906e-9bd4e183162b",
+    "f7acf12b-a17a-5902-98f2-af113b6ddf4f",
+    "b16396ec-25b6-51c2-ad74-38dcf673caf9"
+  ],
+  "country_code": "GB",
+  "industry_id": "323e9566-87df-53de-8657-e2ff2e9572d7",
+  "location_label": "Cambridge, UK",
+  "work_pattern": "Hybrid – 2 office days per week",
+  "employment_type": "Full time"
+}

@@ -1,0 +1,44 @@
+{
+  "job_id": "6856d2f9-45c1-47c2-869c-ad5e0232d555",
+  "title": "Platform Engineer",
+  "company": "Monzo",
+  "summary": "Help build the cloud infrastructure and internal platform used by engineering teams across Monzo. You will improve Kubernetes environments, develop self-service tooling, automate infrastructure, and make production systems safer and easier to operate. The role combines software engineering with platform reliability and offers flexible working from a UK office or remotely within the country.",
+  "responsibilities": [
+    "Operate and improve Kubernetes infrastructure",
+    "Build backend services for self-service infrastructure",
+    "Automate cloud migrations, networking, and security tooling"
+  ],
+  "required_qualifications": [
+    "Practical software engineering",
+    "AWS or GCP",
+    "Kubernetes",
+    "Terraform or infrastructure as code",
+    "Distributed systems curiosity"
+  ],
+  "preferred_qualifications": [
+    "Go programming",
+    "Envoy or service mesh experience",
+    "Developer platform experience"
+  ],
+  "minimum_education_level": null,
+  "required_skill_ids": [
+    "e9743453-bade-5831-bc8c-537100bbbca3",
+    "bd14968e-e409-45af-b362-3495ed7b10e0",
+    "5a196e0c-1217-57fb-a1a4-866c2bacb64e",
+    "58c8eb8d-e236-5b52-8276-78800084f236",
+    "ab773a53-0e6d-5fc8-8b8f-1c1f4e3c17ca"
+  ],
+  "preferred_skill_ids": [
+    "f0de4973-0a70-4644-8fd4-3a97080476f4",
+    "225f6f56-652c-57e6-8209-d9b5fbaa87f1",
+    "17ef492d-0667-4741-99db-bcb1b17159aa"
+  ],
+  "country_code": "GB",
+  "industry_id": "f1f03a9d-e384-5470-80ae-dfee81bfdeaf",
+  "location_label": "London, Cardiff or remote within the UK",
+  "work_pattern": "Flexible UK remote or office",
+  "employment_type": "Full time",
+  "salary": "£65,000–£80,000 plus incentives",
+  "source_url": "https://job-boards.greenhouse.io/monzo/jobs/8119265",
+  "source_checked_at": "2026-08-23"
+}

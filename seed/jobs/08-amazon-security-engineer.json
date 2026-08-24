@@ -1,0 +1,44 @@
+{
+  "job_id": "62428c8b-da6d-4c7d-97df-916de86c6d8d",
+  "title": "Software Development Engineer, Security",
+  "company": "Amazon",
+  "summary": "Join Amazon's security engineering organisation to build systems that help development teams create and release secure software at global scale. You will design dependable services, solve complex engineering problems, contribute to technical architecture, and improve tools used across the business. The work combines hands-on development with operational ownership and collaboration across multiple teams.",
+  "responsibilities": [
+    "Shape architecture for security learning systems",
+    "Build scalable and reliable cloud services",
+    "Lead technical design across security stakeholders"
+  ],
+  "required_qualifications": [
+    "Professional software development experience",
+    "Object-oriented design",
+    "Algorithms and data structures",
+    "Scalable systems architecture",
+    "Technical leadership"
+  ],
+  "preferred_qualifications": [
+    "Bachelor's degree in computer science or equivalent",
+    "Full software development lifecycle",
+    "Cloud security experience"
+  ],
+  "minimum_education_level": null,
+  "required_skill_ids": [
+    "e9743453-bade-5831-bc8c-537100bbbca3",
+    "f7e2eb04-3e50-4561-bce1-7e51a1fec308",
+    "2c8b7c79-0120-55b8-9bb3-c985c4ade82c",
+    "ab773a53-0e6d-5fc8-8b8f-1c1f4e3c17ca",
+    "f0de4973-0a70-4644-8fd4-3a97080476f4"
+  ],
+  "preferred_skill_ids": [
+    "bd14968e-e409-45af-b362-3495ed7b10e0",
+    "c453cf81-6197-428e-84c6-70c773b63f27",
+    "be3c6da6-5e59-5d83-962d-998eb503d0c5"
+  ],
+  "country_code": "GB",
+  "industry_id": "c016f139-067e-5116-a8d2-a0984309376a",
+  "location_label": "London, UK",
+  "work_pattern": "On-site location listed",
+  "employment_type": "Full time",
+  "salary": null,
+  "source_url": "https://amazon.jobs/en/jobs/10491483/software-development-engineer-nextgen-security-zerofriction",
+  "source_checked_at": "2026-08-23"
+}

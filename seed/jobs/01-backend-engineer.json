@@ -1,0 +1,27 @@
+{
+  "job_id": "b61bcf8d-86b0-4b68-8dd2-b1ddb2f9af64",
+  "title": "Senior Backend Engineer",
+  "company": "Aurora Labs",
+  "summary": "Join Aurora Labs to design and improve the backend services behind a growing business platform. You will build Python APIs, strengthen reliability across distributed systems, make architectural decisions, and help other engineers deliver maintainable software. The role suits someone who enjoys owning technically important work from design through production support.",
+  "responsibilities": ["Design Python services", "Own API reliability", "Mentor engineers"],
+  "required_qualifications": ["Python (computer programming)", "FastAPI", "SQL", "Docker", "define software architecture"],
+  "preferred_qualifications": ["cloud technologies", "PostgreSQL", "Systems Analysis"],
+  "minimum_education_level": "bachelors",
+  "required_skill_ids": [
+    "ccd0a1d9-afda-43d9-b901-96344886e14d",
+    "c5bd603a-2abd-5bdd-b6aa-1a7e16bf5796",
+    "598de5b0-5b58-4ea7-8058-a4bc4d18c742",
+    "225f6f56-652c-57e6-8209-d9b5fbaa87f1",
+    "f7e2eb04-3e50-4561-bce1-7e51a1fec308"
+  ],
+  "preferred_skill_ids": [
+    "bd14968e-e409-45af-b362-3495ed7b10e0",
+    "a8d07b5a-c1a1-42c6-9d53-db9c7a2ca996",
+    "ab773a53-0e6d-5fc8-8b8f-1c1f4e3c17ca"
+  ],
+  "country_code": "GB",
+  "industry_id": "c016f139-067e-5116-a8d2-a0984309376a",
+  "location_label": "Manchester, UK",
+  "work_pattern": "Hybrid – 2 office days per week",
+  "employment_type": "Full time"
+}

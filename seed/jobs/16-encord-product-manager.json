@@ -1,0 +1,44 @@
+{
+  "job_id": "b121d770-24fc-4c82-a44d-d66aa8e58070",
+  "title": "Senior Product Manager",
+  "company": "Encord",
+  "summary": "Lead a product area within Encord's AI data platform and take responsibility for strategy, discovery, delivery, and customer outcomes. You will work directly with enterprise users, define a focused roadmap, use evidence to prioritise opportunities, and partner closely with design and engineering. The role suits an independent product leader comfortable with complex technical products.",
+  "responsibilities": [
+    "Own the roadmap and outcomes for a product area",
+    "Lead enterprise customer discovery and validation",
+    "Ship products with engineering, machine learning, and design"
+  ],
+  "required_qualifications": [
+    "Two to five years in product management",
+    "B2B SaaS or enterprise technical products",
+    "Customer discovery",
+    "Metrics-led product decisions",
+    "Independent roadmap ownership"
+  ],
+  "preferred_qualifications": [
+    "AI or machine-learning product knowledge",
+    "Enterprise go-to-market collaboration",
+    "Technical product communication"
+  ],
+  "minimum_education_level": null,
+  "required_skill_ids": [
+    "29fb886c-6be0-4e93-9ea1-232881f2092a",
+    "f52dae0d-df9b-57f5-a986-a478f1f09569",
+    "8998b86e-44c9-5821-8826-caaa607467c8",
+    "683bc3e3-6ec1-4ad2-8d62-d0ac1fabbe76",
+    "c14b6b74-96eb-58aa-87a7-86352df00d56"
+  ],
+  "preferred_skill_ids": [
+    "8369c2d6-c100-4cf6-bd83-9668d8678433",
+    "fe39d4db-4cb5-4299-bb9f-896c8fd6ab13",
+    "c32ad607-0c4d-4e34-b73f-668298f7bf13"
+  ],
+  "country_code": "GB",
+  "industry_id": "323e9566-87df-53de-8657-e2ff2e9572d7",
+  "location_label": "London, UK",
+  "work_pattern": "On-site – typically 4+ days per week",
+  "employment_type": "Full time",
+  "salary": null,
+  "source_url": "https://jobs.ashbyhq.com/encord/b8cfae81-6e9f-4f3e-a03a-2d03e7d115f3",
+  "source_checked_at": "2026-08-23"
+}

@@ -1,0 +1,27 @@
+{
+  "job_id": "14e2545b-a8f5-4ca5-b099-0c22cd0ffed4",
+  "title": "Senior Data Analyst",
+  "company": "Insight Works",
+  "summary": "Insight Works is seeking a senior data analyst to turn product and commercial information into practical business decisions. You will define trustworthy metrics, analyse experiments, investigate changes in performance, and present clear recommendations to senior stakeholders. The work combines hands-on SQL analysis with careful interpretation, visual communication, and constructive challenge of assumptions.",
+  "responsibilities": ["Build metrics", "Analyse experiments", "Present recommendations"],
+  "required_qualifications": ["SQL", "perform data analysis", "deliver visual presentation of data", "communicate with stakeholders", "Experiment analysis"],
+  "preferred_qualifications": ["Python (computer programming)", "Tableau", "Judgment and Decision Making"],
+  "minimum_education_level": "bachelors",
+  "required_skill_ids": [
+    "598de5b0-5b58-4ea7-8058-a4bc4d18c742",
+    "2b92a5b2-6758-4ee3-9fb4-b6387a55cc8f",
+    "c3e36d05-8ae8-447f-bb2b-6f9409f85389",
+    "477173ca-5fc2-406b-9122-95d92811f284",
+    "6ec0b3ef-a8b2-566d-a5af-4cd96c9055cd"
+  ],
+  "preferred_skill_ids": [
+    "ccd0a1d9-afda-43d9-b901-96344886e14d",
+    "85074775-b6c6-5f0d-a16f-c7895861ea18",
+    "3eb442e8-c3f6-56a0-985f-2db43d69ab43"
+  ],
+  "country_code": "GB",
+  "industry_id": "323e9566-87df-53de-8657-e2ff2e9572d7",
+  "location_label": "Birmingham, UK",
+  "work_pattern": "Hybrid – 2 office days per week",
+  "employment_type": "Full time"
+}

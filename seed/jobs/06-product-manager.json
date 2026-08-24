@@ -1,0 +1,27 @@
+{
+  "job_id": "bd821136-803e-421d-928d-c0349121df6c",
+  "title": "Technical Product Manager",
+  "company": "Horizon Systems",
+  "summary": "Horizon Systems is looking for a technical product manager to guide workflow products from early discovery through delivery and improvement. You will speak with customers, define measurable outcomes, maintain the roadmap, and coordinate design and engineering work. The role requires commercial judgment, clear technical communication, and confidence balancing competing stakeholder needs.",
+  "responsibilities": ["Set product direction", "Run customer discovery", "Coordinate delivery"],
+  "required_qualifications": ["plan product management", "Product roadmapping", "Customer discovery", "use analytics for commercial purposes", "apply technical communication skills"],
+  "preferred_qualifications": ["B2B SaaS", "design application interfaces", "Negotiation"],
+  "minimum_education_level": "bachelors",
+  "required_skill_ids": [
+    "29fb886c-6be0-4e93-9ea1-232881f2092a",
+    "c14b6b74-96eb-58aa-87a7-86352df00d56",
+    "8998b86e-44c9-5821-8826-caaa607467c8",
+    "683bc3e3-6ec1-4ad2-8d62-d0ac1fabbe76",
+    "c32ad607-0c4d-4e34-b73f-668298f7bf13"
+  ],
+  "preferred_skill_ids": [
+    "f52dae0d-df9b-57f5-a986-a478f1f09569",
+    "b0096dc5-2e2d-4bc1-8172-05bf486c3968",
+    "f38942b4-54fe-5d0e-8e79-920aa5a9e957"
+  ],
+  "country_code": "GB",
+  "industry_id": "323e9566-87df-53de-8657-e2ff2e9572d7",
+  "location_label": "Leeds, UK",
+  "work_pattern": "Hybrid – 2 office days per week",
+  "employment_type": "Full time"
+}

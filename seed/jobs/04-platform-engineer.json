@@ -1,0 +1,27 @@
+{
+  "job_id": "bfdd4b8a-ce15-4b9b-92c3-ef4698adca4f",
+  "title": "Platform Engineer",
+  "company": "Cloud Forge",
+  "summary": "Cloud Forge is hiring a platform engineer to make software delivery safer, faster, and easier for its product teams. You will operate Kubernetes environments, automate cloud infrastructure with Terraform, and improve continuous-delivery pipelines. The role includes responding to operational problems, removing repetitive work, and building reliable self-service tools for other engineers.",
+  "responsibilities": ["Operate Kubernetes", "Build CI pipelines", "Automate cloud infrastructure"],
+  "required_qualifications": ["Kubernetes", "Terraform", "DevOps", "use digital device operating systems", "cloud technologies"],
+  "preferred_qualifications": ["Docker", "Python (computer programming)", "Systems Evaluation"],
+  "minimum_education_level": "bachelors",
+  "required_skill_ids": [
+    "5a196e0c-1217-57fb-a1a4-866c2bacb64e",
+    "58c8eb8d-e236-5b52-8276-78800084f236",
+    "f0de4973-0a70-4644-8fd4-3a97080476f4",
+    "35f1be97-06c4-4367-a067-7e0e94f2fa70",
+    "bd14968e-e409-45af-b362-3495ed7b10e0"
+  ],
+  "preferred_skill_ids": [
+    "225f6f56-652c-57e6-8209-d9b5fbaa87f1",
+    "ccd0a1d9-afda-43d9-b901-96344886e14d",
+    "2976cc84-2320-563c-8bc5-9211c00ce734"
+  ],
+  "country_code": "GB",
+  "industry_id": "c016f139-067e-5116-a8d2-a0984309376a",
+  "location_label": "Edinburgh, UK",
+  "work_pattern": "Remote-first with monthly office days",
+  "employment_type": "Full time"
+}

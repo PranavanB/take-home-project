@@ -1,0 +1,110 @@
+services:
+  vllm:
+    profiles: ["models"]
+    # v0.26.0, linux/amd64 manifest. The digest makes local model behaviour repeatable.
+    image: vllm/vllm-openai:v0.26.0@sha256:770fe65b2c73ee74a5c42165cf3433de4048cc2cd9c57a937ca4e35aba5aa87b
+    platform: linux/amd64
+    ipc: host
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
+    volumes:
+      - hf_cache:/root/.cache/huggingface
+      - vllm_cache:/root/.cache/vllm
+    ports:
+      - "8001:8000"
+    command:
+      - ${VLLM_MODEL:-unsloth/Qwen3.6-35B-A3B-NVFP4-Fast}
+      - --served-model-name
+      - ${LLM_MODEL:-job-matcher-llm}
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --max-model-len
+      - ${VLLM_MAX_MODEL_LEN:-16384}
+      - --gpu-memory-utilization
+      - ${VLLM_GPU_MEMORY_UTILIZATION:-0.88}
+      - --max-num-seqs
+      - ${VLLM_MAX_NUM_SEQS:-2}
+      - --generation-config
+      - vllm
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60m
+    restart: unless-stopped
+
+  embedding:
+    profiles: ["models"]
+    # Arctic Embed 2.0 runs on CPU, leaving the RTX 5090 for the generation model.
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.9@sha256:c26a226262ad4ff3330fb30b76653c1bb65da2fcf413b92284545a010e0a8a48
+    platform: linux/amd64
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
+    volumes:
+      - embedding_cache:/data
+    ports:
+      - "8002:80"
+    command:
+      - --model-id
+      - ${EMBEDDING_MODEL:-Snowflake/snowflake-arctic-embed-m-v2.0}
+      - --dtype
+      - float32
+      - --max-client-batch-size
+      - "128"
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      LLM_BASE_URL: ${LLM_BASE_URL:-http://vllm:8000/v1}
+      LLM_MODEL: ${LLM_MODEL:-job-matcher-llm}
+      EMBEDDING_BASE_URL: ${EMBEDDING_BASE_URL:-http://embedding:80/v1}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-Snowflake/snowflake-arctic-embed-m-v2.0}
+      SKILL_VECTOR_MINIMUM_SIMILARITY: ${SKILL_VECTOR_MINIMUM_SIMILARITY:-0.25}
+      SKILL_VECTOR_MINIMUM_MARGIN: ${SKILL_VECTOR_MINIMUM_MARGIN:-0.04}
+      SESSION_ROOT: /tmp/job-matcher-sessions
+      SESSION_TTL_SECONDS: ${SESSION_TTL_SECONDS:-600}
+      MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-10485760}
+      MAX_DOCUMENT_PAGES: ${MAX_DOCUMENT_PAGES:-25}
+      MAX_DOCX_UNCOMPRESSED_BYTES: ${MAX_DOCX_UNCOMPRESSED_BYTES:-52428800}
+      WORKER_POLL_SECONDS: ${WORKER_POLL_SECONDS:-0.5}
+      WORKER_LEASE_SECONDS: ${WORKER_LEASE_SECONDS:-30}
+      JOB_DATASET_ROOT: /app/seed/jobs
+      SKILL_CATALOG_PATH: /app/seed/skills/skills.json
+      INDUSTRY_CATALOG_PATH: /app/seed/industries/naics-2022.json
+    volumes:
+      - session_tmp:/tmp/job-matcher-sessions
+    ports:
+      - "8015:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  frontend:
+    build:
+      context: frontend
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "5173:80"
+
+volumes:
+  session_tmp:
+  hf_cache:
+  vllm_cache:
+  embedding_cache:

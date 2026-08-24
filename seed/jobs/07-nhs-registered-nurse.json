@@ -1,0 +1,45 @@
+{
+  "job_id": "e7eea71d-77c6-4e84-a775-53da2ba96cb8",
+  "title": "Registered Nurse",
+  "company": "NHS Professionals",
+  "summary": "Work flexible bank shifts across hospital and community services in Torbay and South Devon. You will assess patients, monitor symptoms and vital signs, arrange diagnostic tests, and respond thoughtfully as clinical situations change. The position requires current nursing registration, recent acute-care experience, compassionate communication, and effective teamwork across several professional disciplines.",
+  "responsibilities": [
+    "Assess and monitor patient conditions",
+    "Check symptoms and vital signs and arrange diagnostic tests",
+    "Make sound decisions as clinical situations change",
+    "Work effectively across nursing and interdisciplinary teams"
+  ],
+  "required_qualifications": [
+    "Degree or diploma in nursing",
+    "Current NMC professional registration",
+    "At least six months of recent paid acute hospital experience",
+    "Patient assessment and monitoring",
+    "Clinical decision making"
+  ],
+  "preferred_qualifications": [
+    "Experience across more than one ward or care setting",
+    "Continued professional development",
+    "Patient and family communication"
+  ],
+  "minimum_education_level": "vocational",
+  "required_skill_ids": [
+    "3eb442e8-c3f6-56a0-985f-2db43d69ab43",
+    "2c8b7c79-0120-55b8-9bb3-c985c4ade82c",
+    "cfbeac36-ae34-58e4-a67f-12d5e26731a9",
+    "3ddaa272-a4ba-59c9-a06a-13625f5ae87d",
+    "b20ae074-e72c-54eb-9e76-4402b2dd1321"
+  ],
+  "preferred_skill_ids": [
+    "254b832b-ffb2-5085-9d47-a041af8e39b2",
+    "73a9c711-20d9-5dc8-bbe5-88d40f7845e5",
+    "be3c6da6-5e59-5d83-962d-998eb503d0c5"
+  ],
+  "country_code": "GB",
+  "industry_id": "e4e0507d-5c95-5dd2-9818-9fe8686ce7e4",
+  "location_label": "Torbay and South Devon, UK",
+  "work_pattern": "Flexible bank shifts",
+  "employment_type": "Bank",
+  "salary": "£18.66–£29.85 per hour",
+  "source_url": "https://www.jobs.nhs.uk/candidate/jobadvert/M0042-26-0129?employer=NHS+Professionals&language=",
+  "source_checked_at": "2026-08-23"
+}

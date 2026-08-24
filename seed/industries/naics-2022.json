@@ -1,0 +1,146 @@
+{
+  "catalog_id": "73ed1c65-8bec-52ee-b909-775405e77d8a",
+  "version": "naics-2022-sector-v1",
+  "industries": [
+    {
+      "industry_id": "b65f4641-63aa-5ef1-9849-8a4566c73082",
+      "naics_code": "11",
+      "preferred_label": "Agriculture, Forestry, Fishing and Hunting",
+      "concept_uri": "https://www.census.gov/naics/?details=11&input=11&year=2022",
+      "aliases": ["Agriculture, Forestry, Fishing and Hunting", "Agriculture", "Forestry", "Fishing", "Hunting"]
+    },
+    {
+      "industry_id": "a2bacb27-9a67-5eaf-b3f9-5b5add6e20d9",
+      "naics_code": "21",
+      "preferred_label": "Mining, Quarrying, and Oil and Gas Extraction",
+      "concept_uri": "https://www.census.gov/naics/?details=21&input=21&year=2022",
+      "aliases": ["Mining, Quarrying, and Oil and Gas Extraction", "Mining", "Quarrying", "Oil and gas"]
+    },
+    {
+      "industry_id": "b5258423-4be7-596b-8f59-b6155f889d29",
+      "naics_code": "22",
+      "preferred_label": "Utilities",
+      "concept_uri": "https://www.census.gov/naics/?details=22&input=22&year=2022",
+      "aliases": ["Utilities", "Energy utilities", "Water utilities"]
+    },
+    {
+      "industry_id": "4f999ef5-54cc-51f3-8988-8596db030ece",
+      "naics_code": "23",
+      "preferred_label": "Construction",
+      "concept_uri": "https://www.census.gov/naics/?details=23&input=23&year=2022",
+      "aliases": ["Construction", "Building construction"]
+    },
+    {
+      "industry_id": "9c2452bd-2f4d-50a7-bfce-8fd167b974c3",
+      "naics_code": "31-33",
+      "preferred_label": "Manufacturing",
+      "concept_uri": "https://www.census.gov/naics/?details=31-33&input=31-33&year=2022",
+      "aliases": ["Manufacturing", "Industrial manufacturing"]
+    },
+    {
+      "industry_id": "fd57e114-0195-52c8-b915-8cff6116ad0a",
+      "naics_code": "42",
+      "preferred_label": "Wholesale Trade",
+      "concept_uri": "https://www.census.gov/naics/?details=42&input=42&year=2022",
+      "aliases": ["Wholesale Trade", "Wholesale", "Distribution"]
+    },
+    {
+      "industry_id": "d2e6399c-10bc-5e88-b437-02afb5b6f181",
+      "naics_code": "44-45",
+      "preferred_label": "Retail Trade",
+      "concept_uri": "https://www.census.gov/naics/?details=44-45&input=44-45&year=2022",
+      "aliases": ["Retail Trade", "Retail", "E-commerce retail"]
+    },
+    {
+      "industry_id": "aae51cdd-a025-5068-af28-6606e7c31219",
+      "naics_code": "48-49",
+      "preferred_label": "Transportation and Warehousing",
+      "concept_uri": "https://www.census.gov/naics/?details=48-49&input=48-49&year=2022",
+      "aliases": ["Transportation and Warehousing", "Transportation", "Warehousing", "Logistics"]
+    },
+    {
+      "industry_id": "c016f139-067e-5116-a8d2-a0984309376a",
+      "naics_code": "51",
+      "preferred_label": "Information",
+      "concept_uri": "https://www.census.gov/naics/?details=51&input=51&year=2022",
+      "aliases": ["Information", "Software publishing", "Telecommunications", "Media"]
+    },
+    {
+      "industry_id": "f1f03a9d-e384-5470-80ae-dfee81bfdeaf",
+      "naics_code": "52",
+      "preferred_label": "Finance and Insurance",
+      "concept_uri": "https://www.census.gov/naics/?details=52&input=52&year=2022",
+      "aliases": ["Finance and Insurance", "Financial services", "Finance", "Banking", "Insurance"]
+    },
+    {
+      "industry_id": "4f944279-12fb-5817-8a88-c6cc897b7921",
+      "naics_code": "53",
+      "preferred_label": "Real Estate and Rental and Leasing",
+      "concept_uri": "https://www.census.gov/naics/?details=53&input=53&year=2022",
+      "aliases": ["Real Estate and Rental and Leasing", "Real estate", "Property", "Rental and leasing"]
+    },
+    {
+      "industry_id": "323e9566-87df-53de-8657-e2ff2e9572d7",
+      "naics_code": "54",
+      "preferred_label": "Professional, Scientific, and Technical Services",
+      "concept_uri": "https://www.census.gov/naics/?details=54&input=54&year=2022",
+      "aliases": ["Professional, Scientific, and Technical Services", "Professional services", "Scientific services", "Technical services", "IT consulting", "Computer systems design"]
+    },
+    {
+      "industry_id": "bd7cb87e-3d31-5e10-a31c-fd30f754a168",
+      "naics_code": "55",
+      "preferred_label": "Management of Companies and Enterprises",
+      "concept_uri": "https://www.census.gov/naics/?details=55&input=55&year=2022",
+      "aliases": ["Management of Companies and Enterprises", "Corporate management", "Holding companies"]
+    },
+    {
+      "industry_id": "72978a0e-3688-56ee-9817-ff19f0292f32",
+      "naics_code": "56",
+      "preferred_label": "Administrative and Support and Waste Management and Remediation Services",
+      "concept_uri": "https://www.census.gov/naics/?details=56&input=56&year=2022",
+      "aliases": ["Administrative and Support and Waste Management and Remediation Services", "Administrative support", "Waste management", "Remediation services"]
+    },
+    {
+      "industry_id": "9f4bef17-6900-5764-a282-84627a302054",
+      "naics_code": "61",
+      "preferred_label": "Educational Services",
+      "concept_uri": "https://www.census.gov/naics/?details=61&input=61&year=2022",
+      "aliases": ["Educational Services", "Education sector", "Schools", "Universities"]
+    },
+    {
+      "industry_id": "e4e0507d-5c95-5dd2-9818-9fe8686ce7e4",
+      "naics_code": "62",
+      "preferred_label": "Health Care and Social Assistance",
+      "concept_uri": "https://www.census.gov/naics/?details=62&input=62&year=2022",
+      "aliases": ["Health Care and Social Assistance", "Health care", "Healthcare", "Social assistance"]
+    },
+    {
+      "industry_id": "49487018-7871-5561-94f7-e552a5e0a956",
+      "naics_code": "71",
+      "preferred_label": "Arts, Entertainment, and Recreation",
+      "concept_uri": "https://www.census.gov/naics/?details=71&input=71&year=2022",
+      "aliases": ["Arts, Entertainment, and Recreation", "Arts", "Entertainment", "Recreation"]
+    },
+    {
+      "industry_id": "f4624735-777f-558a-919d-e55c38f55957",
+      "naics_code": "72",
+      "preferred_label": "Accommodation and Food Services",
+      "concept_uri": "https://www.census.gov/naics/?details=72&input=72&year=2022",
+      "aliases": ["Accommodation and Food Services", "Hospitality", "Accommodation", "Food services", "Restaurants"]
+    },
+    {
+      "industry_id": "8277a948-b240-5233-80d5-da9c8b0e8b2e",
+      "naics_code": "81",
+      "preferred_label": "Other Services (except Public Administration)",
+      "concept_uri": "https://www.census.gov/naics/?details=81&input=81&year=2022",
+      "aliases": ["Other Services (except Public Administration)", "Other services"]
+    },
+    {
+      "industry_id": "ab169fb8-c882-5320-878a-dbc385cef7e2",
+      "naics_code": "92",
+      "preferred_label": "Public Administration",
+      "concept_uri": "https://www.census.gov/naics/?details=92&input=92&year=2022",
+      "aliases": ["Public Administration", "Government", "Public sector"]
+    }
+  ]
+}

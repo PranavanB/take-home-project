@@ -1,0 +1,413 @@
+{
+  "catalog_id": "198e48af-7dda-5ca4-9f33-3f9b2f871f7d",
+  "version": "esco-1.2.1-onet-30.3-poc-v2",
+  "skills": [
+    {
+      "skill_id": "ccd0a1d9-afda-43d9-b901-96344886e14d",
+      "preferred_label": "Python (computer programming)",
+      "source": "esco",
+      "concept_uri": "http://data.europa.eu/esco/skill/ccd0a1d9-afda-43d9-b901-96344886e14d",
+      "aliases": ["Python", "Python programming"]
+    },
+    {
+      "skill_id": "598de5b0-5b58-4ea7-8058-a4bc4d18c742",
+      "preferred_label": "SQL",
+      "source": "esco",
+      "concept_uri": "http://data.europa.eu/esco/skill/598de5b0-5b58-4ea7-8058-a4bc4d18c742",
+      "aliases": ["SQL"]
+    },
+    {
+      "skill_id": "a8d07b5a-c1a1-42c6-9d53-db9c7a2ca996",
+      "preferred_label": "PostgreSQL",
+      "source": "esco",
+      "concept_uri": "http://data.europa.eu/esco/skill/a8d07b5a-c1a1-42c6-9d53-db9c7a2ca996",
+      "aliases": ["PostgreSQL", "Postgres"]
+    },
+    {
+      "skill_id": "867137fb-ff1b-4ca3-99f3-cb6969aa2c68",
+      "preferred_label": "TypeScript",
+      "source": "esco",
+      "concept_uri": "http://data.europa.eu/esco/skill/867137fb-ff1b-4ca3-99f3-cb6969aa2c68",
+      "aliases": ["TypeScript"]
+    },
+    {
+      "skill_id": "e5d1f825-60ed-4bdd-872a-e748c387f777",
+      "preferred_label": "CSS",
+      "source": "esco",
+      "concept_uri": "http://data.europa.eu/esco/skill/e5d1f825-60ed-4bdd-872a-e748c387f777",
+      "aliases": ["CSS", "Cascading Style Sheets"]
+    },
+    {
+      "skill_id": "9b9de2a4-d8af-4a7b-933a-a8334ae60067",
+      "preferred_label": "JavaScript Framework",
+      "source": "esco",
+      "concept_uri": "http://data.europa.eu/esco/skill/9b9de2a4-d8af-4a7b-933a-a8334ae60067",
+      "aliases": ["JavaScript Framework", "JavaScript frameworks"]
+    },
+    {
+      "skill_id": "3e23db60-0c3d-498a-a6ac-ffbed0ecb033",
+      "preferred_label": "ICT accessibility standards",
+      "source": "esco",
+      "concept_uri": "http://data.europa.eu/esco/skill/3e23db60-0c3d-498a-a6ac-ffbed0ecb033",
+      "aliases": ["Web accessibility", "ICT accessibility standards", "WCAG"]
+    },
+    {
+      "skill_id": "8369c2d6-c100-4cf6-bd83-9668d8678433",
+      "preferred_label": "utilise machine learning",
+      "source": "esco",
+      "concept_uri": "http://data.europa.eu/esco/skill/8369c2d6-c100-4cf6-bd83-9668d8678433",
+      "aliases": ["Machine learning", "ML"]
+    },
+    {
+      "skill_id": "b0096dc5-2e2d-4bc1-8172-05bf486c3968",
+      "preferred_label": "design application interfaces",
+      "source": "esco",
+      "concept_uri": "http://data.europa.eu/esco/skill/b0096dc5-2e2d-4bc1-8172-05bf486c3968",
+      "aliases": ["API development", "API design", "REST API", "API products"]
+    },
+    {
+      "skill_id": "f0de4973-0a70-4644-8fd4-3a97080476f4",
+      "preferred_label": "DevOps",
+      "source": "esco",
+      "concept_uri": "http://data.europa.eu/esco/skill/f0de4973-0a70-4644-8fd4-3a97080476f4",
+      "aliases": ["DevOps", "CI/CD", "Continuous integration", "Continuous delivery"]
+    },
+    {
+      "skill_id": "bd14968e-e409-45af-b362-3495ed7b10e0",
+      "preferred_label": "cloud technologies",
+      "source": "esco",
+      "concept_uri": "http://data.europa.eu/esco/skill/bd14968e-e409-45af-b362-3495ed7b10e0",
+      "aliases": ["Cloud technologies", "Cloud infrastructure", "AWS", "Amazon Web Services"]
+    },
+    {
+      "skill_id": "35f1be97-06c4-4367-a067-7e0e94f2fa70",
+      "preferred_label": "use digital device operating systems",
+      "source": "esco",
+      "concept_uri": "http://data.europa.eu/esco/skill/35f1be97-06c4-4367-a067-7e0e94f2fa70",
+      "aliases": ["Linux", "Operating systems"]
+    },
+    {
+      "skill_id": "17ef492d-0667-4741-99db-bcb1b17159aa",
+      "preferred_label": "observe logs",
+      "source": "esco",
+      "concept_uri": "http://data.europa.eu/esco/skill/17ef492d-0667-4741-99db-bcb1b17159aa",
+      "aliases": ["Observability", "Logging", "Monitoring"]
+    },
+    {
+      "skill_id": "2b92a5b2-6758-4ee3-9fb4-b6387a55cc8f",
+      "preferred_label": "perform data analysis",
+      "source": "esco",
+      "concept_uri": "http://data.europa.eu/esco/skill/2b92a5b2-6758-4ee3-9fb4-b6387a55cc8f",
+      "aliases": ["Data analysis", "Analyse data"]
+    },
+    {
+      "skill_id": "c3e36d05-8ae8-447f-bb2b-6f9409f85389",
+      "preferred_label": "deliver visual presentation of data",
+      "source": "esco",
+      "concept_uri": "http://data.europa.eu/esco/skill/c3e36d05-8ae8-447f-bb2b-6f9409f85389",
+      "aliases": ["Data visualisation", "Data visualization", "Dashboarding"]
+    },
+    {
+      "skill_id": "477173ca-5fc2-406b-9122-95d92811f284",
+      "preferred_label": "communicate with stakeholders",
+      "source": "esco",
+      "concept_uri": "http://data.europa.eu/esco/skill/477173ca-5fc2-406b-9122-95d92811f284",
+      "aliases": ["Stakeholder communication", "Communicate with stakeholders"]
+    },
+    {
+      "skill_id": "29fb886c-6be0-4e93-9ea1-232881f2092a",
+      "preferred_label": "plan product management",
+      "source": "esco",
+      "concept_uri": "http://data.europa.eu/esco/skill/29fb886c-6be0-4e93-9ea1-232881f2092a",
+      "aliases": ["Product management", "Plan product management"]
+    },
+    {
+      "skill_id": "fe39d4db-4cb5-4299-bb9f-896c8fd6ab13",
+      "preferred_label": "perform market research",
+      "source": "esco",
+      "concept_uri": "http://data.europa.eu/esco/skill/fe39d4db-4cb5-4299-bb9f-896c8fd6ab13",
+      "aliases": ["Market research", "User research"]
+    },
+    {
+      "skill_id": "683bc3e3-6ec1-4ad2-8d62-d0ac1fabbe76",
+      "preferred_label": "use analytics for commercial purposes",
+      "source": "esco",
+      "concept_uri": "http://data.europa.eu/esco/skill/683bc3e3-6ec1-4ad2-8d62-d0ac1fabbe76",
+      "aliases": ["Analytics", "Data analytics", "Commercial analytics"]
+    },
+    {
+      "skill_id": "c32ad607-0c4d-4e34-b73f-668298f7bf13",
+      "preferred_label": "apply technical communication skills",
+      "source": "esco",
+      "concept_uri": "http://data.europa.eu/esco/skill/c32ad607-0c4d-4e34-b73f-668298f7bf13",
+      "aliases": ["Technical communication", "Technical writing"]
+    },
+    {
+      "skill_id": "f7e2eb04-3e50-4561-bce1-7e51a1fec308",
+      "preferred_label": "define software architecture",
+      "source": "esco",
+      "concept_uri": "http://data.europa.eu/esco/skill/f7e2eb04-3e50-4561-bce1-7e51a1fec308",
+      "aliases": ["Software architecture", "Engineering background"]
+    },
+    {
+      "skill_id": "c453cf81-6197-428e-84c6-70c773b63f27",
+      "preferred_label": "ICT architectural frameworks",
+      "source": "esco",
+      "concept_uri": "http://data.europa.eu/esco/skill/c453cf81-6197-428e-84c6-70c773b63f27",
+      "aliases": ["Event-driven architecture", "Event driven architecture"]
+    },
+    {
+      "skill_id": "225f6f56-652c-57e6-8209-d9b5fbaa87f1",
+      "preferred_label": "Docker",
+      "source": "job_matcher_extension",
+      "concept_uri": "https://job-matcher.local/skills/docker",
+      "aliases": ["Docker"]
+    },
+    {
+      "skill_id": "5a196e0c-1217-57fb-a1a4-866c2bacb64e",
+      "preferred_label": "Kubernetes",
+      "source": "job_matcher_extension",
+      "concept_uri": "https://job-matcher.local/skills/kubernetes",
+      "aliases": ["Kubernetes", "K8s"]
+    },
+    {
+      "skill_id": "58c8eb8d-e236-5b52-8276-78800084f236",
+      "preferred_label": "Terraform",
+      "source": "job_matcher_extension",
+      "concept_uri": "https://job-matcher.local/skills/terraform",
+      "aliases": ["Terraform", "Infrastructure as code"]
+    },
+    {
+      "skill_id": "fd97e6ec-dfa1-5b88-9c97-d88b8948592a",
+      "preferred_label": "React",
+      "source": "job_matcher_extension",
+      "concept_uri": "https://job-matcher.local/skills/react",
+      "aliases": ["React", "React.js", "ReactJS"]
+    },
+    {
+      "skill_id": "c5bd603a-2abd-5bdd-b6aa-1a7e16bf5796",
+      "preferred_label": "FastAPI",
+      "source": "job_matcher_extension",
+      "concept_uri": "https://job-matcher.local/skills/fastapi",
+      "aliases": ["FastAPI"]
+    },
+    {
+      "skill_id": "ec27f64c-6185-5cc0-acf2-10a22af2d04f",
+      "preferred_label": "Django",
+      "source": "job_matcher_extension",
+      "concept_uri": "https://job-matcher.local/skills/django",
+      "aliases": ["Django"]
+    },
+    {
+      "skill_id": "e0e43608-aa8a-5e8c-906e-9bd4e183162b",
+      "preferred_label": "PyTorch",
+      "source": "job_matcher_extension",
+      "concept_uri": "https://job-matcher.local/skills/pytorch",
+      "aliases": ["PyTorch"]
+    },
+    {
+      "skill_id": "24d876b8-3326-5b43-b0cb-f71a1a468ee4",
+      "preferred_label": "Embeddings",
+      "source": "job_matcher_extension",
+      "concept_uri": "https://job-matcher.local/skills/embeddings",
+      "aliases": ["Embeddings", "Text embeddings"]
+    },
+    {
+      "skill_id": "f7acf12b-a17a-5902-98f2-af113b6ddf4f",
+      "preferred_label": "Vector search",
+      "source": "job_matcher_extension",
+      "concept_uri": "https://job-matcher.local/skills/vector-search",
+      "aliases": ["Vector search", "Vector database"]
+    },
+    {
+      "skill_id": "b16396ec-25b6-51c2-ad74-38dcf673caf9",
+      "preferred_label": "LLM serving",
+      "source": "job_matcher_extension",
+      "concept_uri": "https://job-matcher.local/skills/llm-serving",
+      "aliases": ["LLM serving", "vLLM", "Model serving"]
+    },
+    {
+      "skill_id": "85074775-b6c6-5f0d-a16f-c7895861ea18",
+      "preferred_label": "Tableau",
+      "source": "job_matcher_extension",
+      "concept_uri": "https://job-matcher.local/skills/tableau",
+      "aliases": ["Tableau"]
+    },
+    {
+      "skill_id": "6d381176-f760-5325-b077-f04958f2086a",
+      "preferred_label": "dbt",
+      "source": "job_matcher_extension",
+      "concept_uri": "https://job-matcher.local/skills/dbt",
+      "aliases": ["dbt", "data build tool"]
+    },
+    {
+      "skill_id": "c0af9021-d086-5500-97e8-9eba424217a2",
+      "preferred_label": "Vite",
+      "source": "job_matcher_extension",
+      "concept_uri": "https://job-matcher.local/skills/vite",
+      "aliases": ["Vite"]
+    },
+    {
+      "skill_id": "6313f7ed-724f-5483-aba1-533af979ddcd",
+      "preferred_label": "Playwright",
+      "source": "job_matcher_extension",
+      "concept_uri": "https://job-matcher.local/skills/playwright",
+      "aliases": ["Playwright"]
+    },
+    {
+      "skill_id": "f52dae0d-df9b-57f5-a986-a478f1f09569",
+      "preferred_label": "B2B SaaS",
+      "source": "job_matcher_extension",
+      "concept_uri": "https://job-matcher.local/skills/b2b-saas",
+      "aliases": ["B2B SaaS"]
+    },
+    {
+      "skill_id": "c14b6b74-96eb-58aa-87a7-86352df00d56",
+      "preferred_label": "Product roadmapping",
+      "source": "job_matcher_extension",
+      "concept_uri": "https://job-matcher.local/skills/product-roadmapping",
+      "aliases": ["Product roadmapping", "Roadmapping", "Product roadmap"]
+    },
+    {
+      "skill_id": "8998b86e-44c9-5821-8826-caaa607467c8",
+      "preferred_label": "Customer discovery",
+      "source": "job_matcher_extension",
+      "concept_uri": "https://job-matcher.local/skills/customer-discovery",
+      "aliases": ["Customer discovery", "Customer interviews"]
+    },
+    {
+      "skill_id": "6ec0b3ef-a8b2-566d-a5af-4cd96c9055cd",
+      "preferred_label": "Experiment analysis",
+      "source": "job_matcher_extension",
+      "concept_uri": "https://job-matcher.local/skills/experiment-analysis",
+      "aliases": ["Experiment analysis", "A/B testing", "Experimentation"]
+    },
+    {
+      "skill_id": "2f162da2-245a-5473-bb30-27d74edb3bc1",
+      "preferred_label": "Frontend testing",
+      "source": "job_matcher_extension",
+      "concept_uri": "https://job-matcher.local/skills/frontend-testing",
+      "aliases": ["Frontend testing", "UI testing"]
+    },
+    {
+      "skill_id": "2c8b7c79-0120-55b8-9bb3-c985c4ade82c",
+      "preferred_label": "Complex Problem Solving",
+      "source": "onet",
+      "concept_uri": "https://www.onetcenter.org/ctdlasn/resources/ce-07c26809-9119-11e8-b852-782bcb5df6ac",
+      "standard_code": "2.B.2.i",
+      "aliases": ["Complex Problem Solving", "Complex problem-solving"]
+    },
+    {
+      "skill_id": "cfbeac36-ae34-58e4-a67f-12d5e26731a9",
+      "preferred_label": "Coordination",
+      "source": "onet",
+      "concept_uri": "https://www.onetcenter.org/ctdlasn/resources/ce-07c265eb-9119-11e8-b852-782bcb5df6ac",
+      "standard_code": "2.B.1.b",
+      "aliases": ["Coordination", "Team coordination"]
+    },
+    {
+      "skill_id": "be3c6da6-5e59-5d83-962d-998eb503d0c5",
+      "preferred_label": "Instructing",
+      "source": "onet",
+      "concept_uri": "https://www.onetcenter.org/ctdlasn/resources/ce-07c266f7-9119-11e8-b852-782bcb5df6ac",
+      "standard_code": "2.B.1.e",
+      "aliases": ["Instructing", "Training others"]
+    },
+    {
+      "skill_id": "3eb442e8-c3f6-56a0-985f-2db43d69ab43",
+      "preferred_label": "Judgment and Decision Making",
+      "source": "onet",
+      "concept_uri": "https://www.onetcenter.org/ctdlasn/resources/ce-07c27690-9119-11e8-b852-782bcb5df6ac",
+      "standard_code": "2.B.4.e",
+      "aliases": ["Judgment and Decision Making", "Decision making"]
+    },
+    {
+      "skill_id": "d1e2272a-1573-5df4-93b2-2978771954c8",
+      "preferred_label": "Management of Personnel Resources",
+      "source": "onet",
+      "concept_uri": "https://www.onetcenter.org/ctdlasn/resources/ce-07c279a2-9119-11e8-b852-782bcb5df6ac",
+      "standard_code": "2.B.5.d",
+      "aliases": ["Management of Personnel Resources", "People management"]
+    },
+    {
+      "skill_id": "f38942b4-54fe-5d0e-8e79-920aa5a9e957",
+      "preferred_label": "Negotiation",
+      "source": "onet",
+      "concept_uri": "https://www.onetcenter.org/ctdlasn/resources/ce-07c2669e-9119-11e8-b852-782bcb5df6ac",
+      "standard_code": "2.B.1.d",
+      "aliases": ["Negotiation", "Negotiating"]
+    },
+    {
+      "skill_id": "cb24671c-e7bc-59d8-8734-ab4c1e91479c",
+      "preferred_label": "Operations Analysis",
+      "source": "onet",
+      "concept_uri": "https://www.onetcenter.org/ctdlasn/resources/ce-07c271a8-9119-11e8-b852-782bcb5df6ac",
+      "standard_code": "2.B.3.a",
+      "aliases": ["Operations Analysis", "Operational analysis"]
+    },
+    {
+      "skill_id": "3b69f582-6309-5a18-9b6c-5fb743d7746c",
+      "preferred_label": "Persuasion",
+      "source": "onet",
+      "concept_uri": "https://www.onetcenter.org/ctdlasn/resources/ce-07c26648-9119-11e8-b852-782bcb5df6ac",
+      "standard_code": "2.B.1.c",
+      "aliases": ["Persuasion", "Influencing"]
+    },
+    {
+      "skill_id": "e9743453-bade-5831-bc8c-537100bbbca3",
+      "preferred_label": "Programming",
+      "source": "onet",
+      "concept_uri": "https://www.onetcenter.org/ctdlasn/resources/ce-07c27342-9119-11e8-b852-782bcb5df6ac",
+      "standard_code": "2.B.3.e",
+      "aliases": ["Programming", "Software programming"]
+    },
+    {
+      "skill_id": "73a9c711-20d9-5dc8-bbe5-88d40f7845e5",
+      "preferred_label": "Quality Control Analysis",
+      "source": "onet",
+      "concept_uri": "https://www.onetcenter.org/ctdlasn/resources/ce-07c275d8-9119-11e8-b852-782bcb5df6ac",
+      "standard_code": "2.B.3.m",
+      "aliases": ["Quality Control Analysis", "Quality assurance analysis"]
+    },
+    {
+      "skill_id": "3ddaa272-a4ba-59c9-a06a-13625f5ae87d",
+      "preferred_label": "Service Orientation",
+      "source": "onet",
+      "concept_uri": "https://www.onetcenter.org/ctdlasn/resources/ce-07c26751-9119-11e8-b852-782bcb5df6ac",
+      "standard_code": "2.B.1.f",
+      "aliases": ["Service Orientation", "Customer service orientation"]
+    },
+    {
+      "skill_id": "b20ae074-e72c-54eb-9e76-4402b2dd1321",
+      "preferred_label": "Social Perceptiveness",
+      "source": "onet",
+      "concept_uri": "https://www.onetcenter.org/ctdlasn/resources/ce-07c2658f-9119-11e8-b852-782bcb5df6ac",
+      "standard_code": "2.B.1.a",
+      "aliases": ["Social Perceptiveness", "Understanding others"]
+    },
+    {
+      "skill_id": "ab773a53-0e6d-5fc8-8b8f-1c1f4e3c17ca",
+      "preferred_label": "Systems Analysis",
+      "source": "onet",
+      "concept_uri": "https://www.onetcenter.org/ctdlasn/resources/ce-07c276f0-9119-11e8-b852-782bcb5df6ac",
+      "standard_code": "2.B.4.g",
+      "aliases": ["Systems Analysis", "System analysis"]
+    },
+    {
+      "skill_id": "2976cc84-2320-563c-8bc5-9211c00ce734",
+      "preferred_label": "Systems Evaluation",
+      "source": "onet",
+      "concept_uri": "https://www.onetcenter.org/ctdlasn/resources/ce-07c2774f-9119-11e8-b852-782bcb5df6ac",
+      "standard_code": "2.B.4.h",
+      "aliases": ["Systems Evaluation", "System evaluation"]
+    },
+    {
+      "skill_id": "254b832b-ffb2-5085-9d47-a041af8e39b2",
+      "preferred_label": "Time Management",
+      "source": "onet",
+      "concept_uri": "https://www.onetcenter.org/ctdlasn/resources/ce-07c27810-9119-11e8-b852-782bcb5df6ac",
+      "standard_code": "2.B.5.a",
+      "aliases": ["Time Management", "Managing time"]
+    }
+  ]
+}
