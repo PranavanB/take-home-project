@@ -1,5 +1,8 @@
 {
   "job_id": "67aa33b9-f341-45d2-ad69-909833b3e64d",
+  "requirements_version": "job-requirements-v1",
+  "skill_catalog_version": "esco-1.2.1-onet-30.3-poc-v2",
+  "industry_catalog_version": "naics-2022-sector-v1",
   "title": "Product Manager – Search",
   "company": "Rightmove",
   "summary": "Own the search experience used by people looking for homes across Rightmove's website and applications. You will set objectives and performance measures, lead discovery with customers and researchers, validate opportunities, and coordinate delivery with design and engineering. The position calls for strong product judgment, clear prioritisation, and confident use of data in decisions.",
@@ -21,6 +24,7 @@
     "Technical product communication"
   ],
   "minimum_education_level": null,
+  "minimum_experience_months": null,
   "required_skill_ids": [
     "29fb886c-6be0-4e93-9ea1-232881f2092a",
     "8998b86e-44c9-5821-8826-caaa607467c8",

@@ -1,7 +1,7 @@
 # Model smoke-test record
 
 Started: 2026-08-21  
-Updated: 2026-08-22
+Updated: 2026-08-26
 
 ## Environment
 
@@ -72,7 +72,7 @@ Passed with `unsloth/Qwen3.6-35B-A3B-NVFP4-Fast` served as `job-matcher-llm`:
 - First engine initialisation took 158.82 seconds, including 56.31 seconds for compilation.
 - The persistent compile cache reduced a repeated engine initialisation to 36.36 seconds
   and compilation to 5.40 seconds.
-- One four-category profile completed in 18.51 seconds with two roles, ten skills, one
+- One earlier four-category profile completed in 18.51 seconds with two roles, ten skills, one
   qualification, and one degree.
 - Two simultaneous profiles completed in 21.47 and 22.72 seconds. Both returned two roles,
   nine skills, one qualification, and one degree.
@@ -91,26 +91,38 @@ category counts—not CV content.
 ### Post-Arctic end-to-end status
 
 A synthetic PDF upload was started after the Arctic service and calibrated thresholds were
-connected to the API. It exercised live CV extraction, job extraction, semantic mapping,
-and exact matching. The run was intentionally interrupted before completion when the user
-requested that all GPU workloads be stopped. It is therefore **not** recorded as a passed
-end-to-end check.
+connected to the API. That earlier run used the pipeline version active at the time and was
+intentionally interrupted before completion when the GPU was released. It is therefore
+**not** recorded as a passed end-to-end check for the current persisted-job pipeline.
 
 The earlier live PDF upload described above remains a valid pass for the grounded vLLM
-profile pipeline and exact fixture matcher, but it predates live Arctic mapping of both CV
-and job phrases.
+profile pipeline and exact fixture matcher, but it predates the current Experience category,
+persisted job requirements, and live Arctic mapping used for CV skill phrases.
+
+### 26 August readiness rerun
+
+- The CPU Arctic endpoint returned HTTP 200 from its health endpoint.
+- vLLM loaded all five checkpoint shards in 52.58 seconds, reused its compile cache, and
+  exposed `job-matcher-llm` from `/v1/models`.
+- vLLM reported 20.61 GiB for model loading, 4.91 GiB of KV cache, and 364,916 cache tokens.
+- Host GPU use reached approximately 29,920 MiB of 32,607 MiB after model warm-up.
+- A synthetic Jordan Taylor PDF was generated from `seed/sample-resume.md` for the browser
+  journey. The in-app automation's file chooser did not expose a file-selection event, so
+  the PDF never reached the application and no result from this attempt is claimed.
+- The user then requested that Job Matcher GPU work stop while ComfyUI remain available, so
+  the rerun ended before CV processing.
 
 ## Current runtime state
 
-At the end of the 22 August session:
+As of 26 August 2026:
 
 - the vLLM container is stopped to release the RTX 5090;
-- ComfyUI and Comfy Desktop GPU processes are stopped;
-- GPU use fell from 32,009 MiB at 100% to approximately 1,452 MiB of normal Windows display
-  use;
-- the CPU-only Arctic embedding container remains running; and
-- the API and frontend remain running, although new CV processing cannot complete until
-  vLLM is restarted.
+- the CPU-only Arctic embedding container is also stopped;
+- ComfyUI, Comfy Desktop, and the ComfyUI Python process remain running as requested;
+- after the Job Matcher model services stopped, total GPU use was approximately 3,113 MiB
+  of 32,607 MiB; and
+- the API and frontend remain running. The jobs catalogue is available, but new CV
+  processing cannot complete until both vLLM and Arctic are restarted.
 
 ## Pending
 

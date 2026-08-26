@@ -20,8 +20,9 @@ UI, general dashboard, comparison heatmap, or multi-step onboarding.
 
 Resume bytes, extracted text, profile data, resume vectors, and match results are
 **session-scoped temporary data**. The original PDF/DOCX is deleted after successful
-text extraction. Everything else is deleted when the user refreshes or leaves the
-experience, with an accepted ten-minute expiry lease as the guaranteed cleanup fallback.
+text extraction. Everything else is deleted when the user explicitly starts over or after
+the user leaves and the accepted ten-minute expiry lease elapses. A refresh restores an
+active session rather than deleting it.
 No CV or personal match history is retained after POC cleanup. A real authenticated
 product would retain the original CV and derived user data under an explicit retention
 and user-control policy so improved systems can reprocess the source document.
@@ -46,8 +47,9 @@ on the results page; it must not complicate the core flow.
 1. **vLLM is the default LLM-serving path**, with host LM Studio kept as a fallback
    compose profile.
 2. **Model tier = one dedicated vLLM container plus one CPU embedding container.** vLLM
-   extracts grounded CV and job facts. Snowflake Arctic Embed 2.0 maps unresolved skill
-   wording to the reviewed catalogue. The final fit decision remains deterministic
+   extracts grounded CV facts and prepares job facts during vacancy ingestion. Snowflake
+   Arctic Embed 2.0 maps unresolved skill wording to the reviewed catalogue. The final fit
+   decision remains deterministic
    application logic; retrieval and cross-encoder reranking are deferred. The separate
    inference boundary supports independent scaling and makes a later GPU-vendor migration
    manageable, although each vendor still requires a fixed compatible runtime, image, and
@@ -73,11 +75,13 @@ on the results page; it must not complicate the core flow.
    are appropriate good practice for these public, independently generated identities,
    but they are not treated as authorization or as universally superior database keys.
 9. The mandatory result is the **top three jobs**, each with `Met | Missing` requirements,
-   citations, and concrete gap-closing actions. Required exact matches determine order;
-   preferred exact matches break ties. The requested required/preferred weights, category
-   weights, and normalized overall percentage are pinned for one separate scoring review.
+   citations, and concrete gap-closing actions. Required weighted category coverage determines
+   order; preferred weighted category coverage breaks ties. The explicit POC weights are
+   Skills 40%, Experience 25%, Education 15%, Location 10%, and Industry 10%. Numerical
+   required/preferred weights, validation of these initial category weights, and a normalized
+   overall percentage remain pinned for one separate scoring review.
 10. **No long-term CV or match retention in the POC.** The raw upload is deleted after
-    successful text extraction. The extracted profile, working job specs, embeddings,
+    successful text extraction. The extracted profile, embeddings,
     evidence, and results exist only inside the temporary session or worker memory.
     Explicitly choosing another CV removes the entire session directory. Refresh restores
     the active session; leaving stops its heartbeat and the ten-minute expiry lease provides
@@ -146,7 +150,7 @@ Two properties are worth stating plainly:
 
 | Profile | Brings up | Use |
 |---|---|---|
-| *(default)* | frontend, api | app development against an already-running LLM endpoint |
+| *(default)* | frontend, api | app development against already-running model endpoints |
 | `models` | + vllm + CPU Arctic embedding service | complete self-contained POC stack |
 
 Profiles control which containers start; they do **not** switch endpoint configuration.
@@ -181,7 +185,7 @@ job-matcher/
 │  └─ model-smoke.md             # live model and hardware checks
 ├─ seed/
 │  ├─ sample-resume.md           # source text for the synthetic sample CV
-│  ├─ jobs/                      # bundled standard dataset: exactly 6 job specs
+│  ├─ jobs/                      # bundled standard dataset: exactly 16 job specs
 │  ├─ skills/skills.json         # 56 ESCO/O*NET/local skill concepts
 │  └─ industries/naics-2022.json # 20 NAICS sectors
 ├─ backend/
@@ -200,7 +204,7 @@ job-matcher/
 │  │  ├─ gateway.py              # schema-constrained vLLM and embedding clients
 │  │  └─ main.py                 # service wiring and health contract
 │  ├─ scripts/                   # synthetic model and pipeline smoke checks
-│  └─ tests/                     # 38 backend tests
+│  └─ tests/                     # 44 backend tests
 └─ frontend/
    ├─ Dockerfile  nginx.conf     # nginx also proxies the /api path
    └─ src/                       # React + TypeScript + Vite interface
@@ -233,7 +237,8 @@ Generic recursive splitting is unnecessary for the 16-job POC. The document read
 keeps PDF pages or ordered DOCX paragraphs/tables as source blocks. The generation model
 extracts grounded CV and job skill phrases. Exact aliases and Arctic vector similarity map
 accepted phrases to reviewed skill UUIDs. The validated profile then reduces matching
-evidence to education level, standardized skill UUIDs, ISO country, and NAICS industry.
+evidence to education level, standardized skill UUIDs, total dated experience months,
+ISO country, and NAICS industry.
 Every comparison has a deterministic UUID.
 
 The reviewed standards deliberately target European and North American coverage: ESCO for
@@ -245,13 +250,14 @@ windows, overlap rules, persisted vector identities, or a second chunking pipeli
 
 ### 3. Candidate analysis — exact-join all 16 jobs
 
-1. Load all 16 validated job fixtures.
-2. Extract explicit required/preferred job skills and map them through the same exact-alias
-   and Arctic route used for CV skills.
-3. Derive stable required and preferred requirement UUIDs for each job.
+1. Load all 16 validated, versioned job fixtures.
+2. Confirm every fixture uses the runtime skill/industry catalogue versions. Job skill
+   extraction and Arctic mapping happen once during ingestion, not for every candidate.
+3. Derive stable required and preferred requirement UUIDs from the persisted job facts.
 4. Insert standardized job requirements and candidate facts into a fresh in-memory SQLite
    database.
-5. Left-join on identical skill UUID, education key, country code, or NAICS industry UUID.
+5. Left-join on identical skill UUID, education key, experience-month key, country code, or
+   NAICS industry UUID.
 6. Rank all 16 results and retain exactly three temporary result records.
 
 Arctic embeddings are used only for mapping wording to the small standard skill list.
@@ -286,13 +292,15 @@ a reproducible exact database comparison.
 
 The worker first extracts a structured, read-only profile:
 
-`Profile { headline, experiences[], standardized_skills[], education_level, country, industry }`
+`Profile { headline, experiences[], total_experience_months, standardized_skills[], education_level, country, industry }`
 
 Experiences are normalized by date. A role marked current appears first; otherwise the
 role with the latest end/start date appears first. Company and job title remain separate
 fields. Degrees are placed under education; certifications, licences, and other formal
 professional or vocational achievements are placed under qualifications. The UI shows
-the profile exactly as extracted and offers no editing.
+the profile exactly as extracted and offers no editing. Skills are extracted from employment
+history and responsibilities, not just from a Skills section. Overlapping dated roles are
+merged before total experience months are calculated.
 
 Explicit `Industry:`, `Sector:`, or `Business domain:` values are also checked directly
 against the reviewed NAICS aliases. This exact application-code fallback prevents a
@@ -301,9 +309,10 @@ industry from a company name.
 
 The models standardize inputs but do not grade fit. The process is:
 
-1. Extract grounded CV facts and explicit job skills.
-2. Map CV and job skill wording to the same reviewed UUID catalogue.
-3. Load each job's minimum education, country, NAICS industry, and normalized skills.
+1. Extract grounded CV facts, including skills stated inside employment history.
+2. Map CV skill wording to the same reviewed UUID catalogue used by persisted jobs.
+3. Load each job's minimum education, experience months, country, NAICS industry, and
+   normalized skills with its requirements/catalogue versions.
 4. Convert the candidate profile to the same stable database keys.
 5. Run an exact in-memory database join for every requirement.
 6. Return `Met` when a key joins and `Missing` when it does not.
@@ -311,10 +320,10 @@ The models standardize inputs but do not grade fit. The process is:
 
 Results are held only in the session directory, and each requirement result is
 traceable to a resume span and job requirement. The results page reads the temporary
-profile and top-three matches without invoking a model. Counts rank required coverage
-first and preferred coverage second. All three requested scoring layers—requirement
-importance, category importance, and an overall normalized percentage—remain pinned for a
-separate review.
+profile and top-three matches without invoking a model. Explicit category-normalized scores
+rank required coverage first and preferred coverage second. Titles are display-only and
+cannot affect fit or tie-breaking. Required/preferred numerical weights, validation of the
+initial category weights, and an overall normalized percentage remain pinned for review.
 
 ### 5. Ingestion is an async, recoverable job
 
@@ -411,14 +420,15 @@ in-app trace viewer are stretch work.
 
 ### 9. Quality controls
 
-- Thirty-eight backend tests cover document reading, profile validation, UUID stability,
+- Forty-four backend tests cover document reading, profile validation, UUID stability,
   session recovery/deletion, complete matching, deterministic ranking, evidence recovery,
   refusal to match raw free text, and the retry API.
 - Controlled fake generators keep the normal suite fast and deterministic with no GPU or
   model service running.
 - Separate smoke and live journey checks exercise the real vLLM and Arctic paths. The
   final SQLite join is covered deterministically without a model service; the complete
-  post-Arctic live journey still needs to be rerun after vLLM is restarted.
+  current post-Arctic live journey still needs to be rerun after both model services are
+  restarted.
 - A larger labelled ranking/evidence evaluation is future work after fit scoring is agreed.
 
 ---
@@ -432,8 +442,9 @@ A simple, responsive, single-column journey with three states:
 - Product name: **Job Matcher**.
 - One short sentence explaining that a resume will be matched against the standard job dataset.
 - One primary button: **Upload your resume**.
+- One secondary button: **View available jobs**, opening the searchable 16-role catalogue.
 - Accept PDF and DOCX. Markdown and plain text may remain internal test fixtures but are
-  not public POC formats. No navigation, dashboard, job upload, or secondary call to action.
+  not public POC formats. No general navigation, dashboard, or job-upload action.
 
 ### State 2 — Processing
 
@@ -454,8 +465,9 @@ A simple, responsive, single-column journey with three states:
 - Show exactly three ranked job cards from the standard dataset. Each card contains job
   title, company, requirements matched, requirements missing, and **How to
   improve your alignment**.
-- Show numeric Met/Missing counts for Education, Skills, Location, and Industry, plus
-  required and preferred totals. Requirement weights, category weights, and the normalized
+- Show numeric percentages, weights, and Met/Missing counts for Education, Skills,
+  Experience, Location, and Industry, plus required and preferred totals. Numerical
+  required/preferred weights, validation of the initial category weights, and the normalized
   overall percentage wait for the separately pinned scoring review.
 - Every match/gap is expandable to its cited CV evidence and job requirement.
 - Recommendations may explain how to cover all documented requirements, but never promise
@@ -480,7 +492,8 @@ technology roles and five roles across health care, retail, hospitality, facilit
 services, and aviation. This makes “top three” a meaningful
 ranking choice without creating a large ingestion problem. Each fixture has a stable UUID,
 title, company, summary, responsibilities, required qualifications, preferred
-qualifications, and source text. Researched roles also retain the employer source URL and
+qualifications, normalized requirement/catalogue versions, and source text. Researched roles
+also retain the employer source URL and
 the date it was checked. Dataset validation is a build command, not
 part of the user interface.
 
@@ -499,7 +512,7 @@ Each phase ends at a runnable state. Work does not proceed past a failed gate.
 | **1 — Thin scaffold + identities** | git init; Pydantic schemas; UUIDv4 root IDs and UUIDv5 derived IDs; one health-only API; frontend; nginx; temporary volume; explicit `up-*` targets; validate the UUID-backed standard dataset. |
 | **2 — Ephemeral sessions + recovery** | UUID-named directories, atomic manifests, heartbeat/close APIs, cleanup janitor, leased worker, deterministic stage outputs, retry endpoint, and SSE status. Recovery and deletion tests pass before feature work expands. |
 | **3 — Upload + profile journey** | Welcome page, resume upload, processing state, PDF/DOCX parsing, structured profile extraction, current-role ordering, read-only profile summary, and recoverable errors. |
-| **4 — Matching + results** | Extract CV/job skills, use exact aliases and Arctic mapping to standardize them, exact-join all 16 jobs against education, skills, country, and NAICS industry; rank required then preferred coverage; hold exactly three results; show category counts, evidence, and gap actions. |
+| **4 — Matching + results** | Extract CV skills, use exact aliases and Arctic mapping to standardize them against persisted versioned jobs, exact-join all 16 jobs against education, skills, experience months, country, and NAICS industry; rank weighted required then preferred category coverage; hold exactly three results; show category counts, evidence, and gap actions. |
 | **5 — Scoring review + handoff** | Review customer-facing weights and percentages; run focused quality checks and crash tests; polish responsive UI, README, architecture notes, and screenshots. |
 
 ---
@@ -522,7 +535,8 @@ Each phase ends at a runnable state. Work does not proceed past a failed gate.
   lease, SSE reconnects, the first incomplete stage resumes, attempts remain visible,
   and deterministic artifact IDs prevent duplicates.
 - **Profile check**: current/latest role appears first and the visible comparison fields
-  are standardized Education, Skills, Location, and Industry without an edit/confirm step.
+  are standardized Education, Skills, Experience, Location, and Industry without an
+  edit/confirm step.
 - **Explanation check**: every `Met` claim links to resume evidence; every gap
   links to a standard-job requirement; actions never invent existing experience or promise a job.
 - **Adversarial check**: an instruction embedded in a resume bullet is treated as data
@@ -563,8 +577,9 @@ search/filter UI; heatmap comparison; trace viewer; OpenTelemetry; Prometheus; l
 LLM-judged eval suite; classifier-based injection screening; rate limiting; interview
 preparation; resume rewriting; multi-user auth and tenancy; production user-data
 retention; OCR for scanned PDFs; cross-encoder distillation; a real queue broker;
-Kubernetes manifests. Required/preferred weights, category weights, and the normalized
+Kubernetes manifests; certification/licence matching; broad labour-market skill coverage;
+skill-specific experience duration; and detailed city/remote/visa/relocation matching.
+Required/preferred weights, validation of the initial category weights, and the normalized
 overall percentage remain out until their formula and product meaning pass the separately
-pinned scoring review; the current internal ranking is still required to select the top
-three. Chat remains outside the primary journey unless the original brief requires the
-small compliance input noted in Context.
+pinned scoring review. Chat remains outside the primary journey unless the original brief
+requires the small compliance input noted in Context.

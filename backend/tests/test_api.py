@@ -47,6 +47,7 @@ def test_upload_heartbeat_and_close_contract(tmp_path) -> None:
         assert health.json()["job_fixture_count"] == 16
         assert health.json()["standard_skill_count"] == 56
         assert health.json()["industry_count"] == 20
+        assert health.json()["job_requirements_version"] == "job-requirements-v1"
 
         created = client.post(
             "/api/match-sessions",
@@ -109,6 +110,7 @@ def test_available_jobs_lists_all_public_roles_and_sources(tmp_path) -> None:
     assert jobs[0]["title"] == "Senior Backend Engineer"
     assert jobs[0]["company"] == "Aurora Labs"
     assert jobs[0]["minimum_education_level"] == "bachelors"
+    assert jobs[0]["minimum_experience_months"] is None
     assert jobs[0]["country_code"] == "GB"
     assert jobs[0]["industry_label"] == "Information"
     assert jobs[0]["location_label"] == "Manchester, UK"

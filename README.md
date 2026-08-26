@@ -8,18 +8,23 @@ healthcare, retail, hospitality, facilities services, and aviation.
 
 ## How matching works
 
-The local vLLM service extracts grounded CV facts and the skills explicitly requested by
-each bundled job. Snowflake Arctic Embed 2.0 maps unfamiliar skill wording to the reviewed
-skill catalogue. Application code then reduces both sides to the same four categories:
+The local vLLM service extracts grounded CV facts, including skills stated inside employment
+history rather than only a dedicated skills section. Snowflake Arctic Embed 2.0 maps
+unfamiliar skill wording to the reviewed skill catalogue. The 16 bundled jobs already hold
+persisted, versioned normalized requirements, so they are not reinterpreted for each CV.
+Application code reduces both sides to the same five categories:
 
 - education level, aligned to EQF levels 4–8;
 - skills, stored as UUIDs from a versioned ESCO- and O*NET-backed catalogue;
+- total dated experience, stored as an exact minimum-month key;
 - location, stored as an ISO country code; and
 - industry, stored as a 2022 NAICS sector UUID.
 
 The match itself is an exact join in a temporary in-memory SQLite database. It does not
-ask the language model to judge fit. Results are either **Met** or **Missing**, and jobs
-rank by required matches first and preferred matches second.
+ask the language model to judge fit. Results are either **Met** or **Missing**. Ranking uses
+explicit POC category weights—Skills 40%, Experience 25%, Education 15%, Location 10%, and
+Industry 10%—with required coverage considered before preferred coverage. Job titles are
+display fields and never affect the match or its tie-breaks.
 
 ## Current features
 
@@ -27,16 +32,17 @@ rank by required matches first and preferred matches second.
 - PDF/DOCX validation and source-aware text extraction
 - Raw CV deletion immediately after successful reading
 - Grounded, schema-constrained profile extraction through a separate vLLM container
-- Skill extraction from both CVs and jobs, followed by Arctic Embed 2.0 vector mapping
+- Skill extraction from all parts of the CV, followed by Arctic Embed 2.0 vector mapping
 - Conservative vector acceptance: ambiguous or weak mappings remain visibly unmapped
 - Deterministic exact mapping for explicitly labelled CV industries
-- 56 stable standardized skill concepts, 20 NAICS sectors, and 16 normalized jobs
+- 56 stable standardized skill concepts, 20 NAICS sectors, and 16 persisted, versioned
+  normalized jobs
 - Searchable available-jobs catalogue backed by the same 16-job matching dataset
 - Source links and research dates for the ten employer-sourced listings
 - A mixed-sector catalogue rather than a technology-only vacancy list
 - Multi-sentence job descriptions and human-readable city or regional locations
-- Exact education, skill, country, and industry matching
-- Deterministic top three with category counts, evidence, and gap actions
+- Exact education, skill, experience-duration, country, and industry matching
+- Deterministic weighted top three with per-category percentages, evidence, and gap actions
 - Heartbeat expiry and explicit whole-session deletion
 - Test-first backend coverage and a responsive React interface
 
@@ -86,5 +92,14 @@ npm install
 npm run dev
 ```
 
-Or run only the API and frontend with `docker compose up --build` when a compatible LLM
-endpoint is already available.
+Or run only the API and frontend with `docker compose up --build` when compatible LLM
+and embedding endpoints are already available. The jobs catalogue remains usable when the
+local model services are stopped, but a new CV cannot finish processing without both model
+endpoints.
+
+To release the GPU while leaving the API and frontend available for interface and catalogue
+work:
+
+```powershell
+docker compose --env-file .env.models --profile models stop vllm embedding
+```

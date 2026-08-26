@@ -1,5 +1,8 @@
 {
   "job_id": "b121d770-24fc-4c82-a44d-d66aa8e58070",
+  "requirements_version": "job-requirements-v1",
+  "skill_catalog_version": "esco-1.2.1-onet-30.3-poc-v2",
+  "industry_catalog_version": "naics-2022-sector-v1",
   "title": "Senior Product Manager",
   "company": "Encord",
   "summary": "Lead a product area within Encord's AI data platform and take responsibility for strategy, discovery, delivery, and customer outcomes. You will work directly with enterprise users, define a focused roadmap, use evidence to prioritise opportunities, and partner closely with design and engineering. The role suits an independent product leader comfortable with complex technical products.",
@@ -21,6 +24,7 @@
     "Technical product communication"
   ],
   "minimum_education_level": null,
+  "minimum_experience_months": 24,
   "required_skill_ids": [
     "29fb886c-6be0-4e93-9ea1-232881f2092a",
     "f52dae0d-df9b-57f5-a986-a478f1f09569",

@@ -1,5 +1,8 @@
 {
   "job_id": "e7eea71d-77c6-4e84-a775-53da2ba96cb8",
+  "requirements_version": "job-requirements-v1",
+  "skill_catalog_version": "esco-1.2.1-onet-30.3-poc-v2",
+  "industry_catalog_version": "naics-2022-sector-v1",
   "title": "Registered Nurse",
   "company": "NHS Professionals",
   "summary": "Work flexible bank shifts across hospital and community services in Torbay and South Devon. You will assess patients, monitor symptoms and vital signs, arrange diagnostic tests, and respond thoughtfully as clinical situations change. The position requires current nursing registration, recent acute-care experience, compassionate communication, and effective teamwork across several professional disciplines.",
@@ -22,6 +25,7 @@
     "Patient and family communication"
   ],
   "minimum_education_level": "vocational",
+  "minimum_experience_months": 6,
   "required_skill_ids": [
     "3eb442e8-c3f6-56a0-985f-2db43d69ab43",
     "2c8b7c79-0120-55b8-9bb3-c985c4ade82c",

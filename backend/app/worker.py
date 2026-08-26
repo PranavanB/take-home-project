@@ -15,7 +15,6 @@ from app.domain import (
     SessionManifest,
     SessionStatus,
 )
-from app.job_skill_extractor import JobSkillNormalizer
 from app.matcher import MatchAnalyzer
 from app.profile_extractor import ProfileExtractor
 from app.session_store import SessionNotFoundError, SessionStore
@@ -39,7 +38,6 @@ class DocumentWorker:
         lease_seconds: int,
         profile_extractor: ProfileExtractor,
         match_analyzer: MatchAnalyzer | None = None,
-        job_skill_normalizer: JobSkillNormalizer | None = None,
         jobs: list[JobFixture] | None = None,
     ) -> None:
         self.store = store
@@ -49,7 +47,6 @@ class DocumentWorker:
         self.lease_seconds = lease_seconds
         self.profile_extractor = profile_extractor
         self.match_analyzer = match_analyzer
-        self.job_skill_normalizer = job_skill_normalizer
         self.jobs = jobs or []
 
     async def run(self) -> None:
@@ -216,12 +213,7 @@ class DocumentWorker:
             profile = CandidateProfile.model_validate_json(
                 self.store.read_artifact(session_id, CANDIDATE_PROFILE_FILENAME)
             )
-            jobs = (
-                await self.job_skill_normalizer.normalize_all(self.jobs)
-                if self.job_skill_normalizer is not None
-                else self.jobs
-            )
-            results = await self.match_analyzer.analyze(profile=profile, jobs=jobs)
+            results = await self.match_analyzer.analyze(profile=profile, jobs=self.jobs)
             self.store.write_model_artifact(session_id, MATCH_RESULTS_FILENAME, results)
 
         completed = self.store.read_manifest(session_id)

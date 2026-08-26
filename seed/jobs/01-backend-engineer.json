@@ -1,5 +1,8 @@
 {
   "job_id": "b61bcf8d-86b0-4b68-8dd2-b1ddb2f9af64",
+  "requirements_version": "job-requirements-v1",
+  "skill_catalog_version": "esco-1.2.1-onet-30.3-poc-v2",
+  "industry_catalog_version": "naics-2022-sector-v1",
   "title": "Senior Backend Engineer",
   "company": "Aurora Labs",
   "summary": "Join Aurora Labs to design and improve the backend services behind a growing business platform. You will build Python APIs, strengthen reliability across distributed systems, make architectural decisions, and help other engineers deliver maintainable software. The role suits someone who enjoys owning technically important work from design through production support.",
@@ -7,6 +10,7 @@
   "required_qualifications": ["Python (computer programming)", "FastAPI", "SQL", "Docker", "define software architecture"],
   "preferred_qualifications": ["cloud technologies", "PostgreSQL", "Systems Analysis"],
   "minimum_education_level": "bachelors",
+  "minimum_experience_months": null,
   "required_skill_ids": [
     "ccd0a1d9-afda-43d9-b901-96344886e14d",
     "c5bd603a-2abd-5bdd-b6aa-1a7e16bf5796",

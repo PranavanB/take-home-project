@@ -1,5 +1,8 @@
 {
   "job_id": "97c77bbe-bf5f-4cd0-a95e-618179954824",
+  "requirements_version": "job-requirements-v1",
+  "skill_catalog_version": "esco-1.2.1-onet-30.3-poc-v2",
+  "industry_catalog_version": "naics-2022-sector-v1",
   "title": "Cleaning Operative",
   "company": "Mitie",
   "summary": "Provide scheduled cleaning services at St George's University Hospital and help maintain a safe, welcoming environment. You will follow agreed routines, use cleaning materials correctly, maintain equipment, and meet service standards across designated areas. The role suits someone reliable and proactive who can work independently while contributing positively to the wider facilities team.",
@@ -22,6 +25,7 @@
     "Knowledge of commercial cleaning equipment"
   ],
   "minimum_education_level": null,
+  "minimum_experience_months": null,
   "required_skill_ids": [
     "73a9c711-20d9-5dc8-bbe5-88d40f7845e5",
     "254b832b-ffb2-5085-9d47-a041af8e39b2",

@@ -18,6 +18,7 @@ class RequirementImportance(StrEnum):
 class MatchCategory(StrEnum):
     EDUCATION = "education"
     SKILLS = "skills"
+    EXPERIENCE = "experience"
     LOCATION = "location"
     INDUSTRY = "industry"
 
@@ -59,6 +60,8 @@ class RequirementMatch(StrictMatchModel):
 
 class CategoryCoverage(StrictMatchModel):
     category: MatchCategory
+    weight_percent: int = Field(ge=0, le=100)
+    coverage_percent: int = Field(ge=0, le=100)
     met: int = Field(ge=0)
     missing: int = Field(ge=0)
 
@@ -73,6 +76,8 @@ class JobMatch(StrictMatchModel):
     required_coverage_max: int = Field(ge=0)
     preferred_coverage_points: int = Field(ge=0)
     preferred_coverage_max: int = Field(ge=0)
+    required_rank_score: int = Field(ge=0, le=10_000)
+    preferred_rank_score: int = Field(ge=0, le=10_000)
     category_coverage: list[CategoryCoverage]
     requirements: list[RequirementMatch]
 
@@ -81,4 +86,5 @@ class MatchResults(StrictMatchModel):
     analysis_id: UUID
     profile_id: UUID
     matcher_version: str
+    job_requirements_version: str
     top_matches: list[JobMatch] = Field(min_length=3, max_length=3)

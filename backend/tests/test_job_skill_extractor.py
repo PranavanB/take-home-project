@@ -36,7 +36,7 @@ class UnusedEmbeddingGateway:
 
 
 @pytest.mark.asyncio
-async def test_job_skills_are_llm_extracted_mapped_and_cached() -> None:
+async def test_job_skills_are_llm_extracted_and_mapped_without_using_title() -> None:
     seed_root = Path(__file__).resolve().parents[2] / "seed"
     job = load_job_dataset(seed_root / "jobs")[0]
     catalog = load_skill_catalog(seed_root / "skills" / "skills.json")
@@ -49,17 +49,13 @@ async def test_job_skills_are_llm_extracted_mapped_and_cached() -> None:
     normalizer = JobSkillNormalizer(generator=generator, mapper=mapper)
 
     first = await normalizer.normalize(job)
-    second = await normalizer.normalize(job)
-
     by_label = {skill.preferred_label: skill.skill_id for skill in catalog.skills}
-    assert first == second
     assert first.required_skill_ids == [
         by_label["Python (computer programming)"],
         by_label["design application interfaces"],
     ]
     assert first.preferred_skill_ids == [by_label["Systems Analysis"]]
     assert generator.calls == 1
-    assert job.title in generator.user_prompt
+    assert job.title not in generator.user_prompt
     assert "Own API reliability" in generator.user_prompt
     assert generator.schema["additionalProperties"] is False
-

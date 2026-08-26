@@ -20,6 +20,9 @@ def load_job_dataset(root: Path) -> list[JobFixture]:
     ids = {job.job_id for job in jobs}
     if len(ids) != len(jobs):
         raise CatalogError("Job fixture UUIDs must be unique")
+    versions = {job.requirements_version for job in jobs}
+    if len(versions) != 1:
+        raise CatalogError("Job fixtures must use one requirements version")
     return jobs
 
 

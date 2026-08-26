@@ -1,5 +1,8 @@
 {
   "job_id": "bd821136-803e-421d-928d-c0349121df6c",
+  "requirements_version": "job-requirements-v1",
+  "skill_catalog_version": "esco-1.2.1-onet-30.3-poc-v2",
+  "industry_catalog_version": "naics-2022-sector-v1",
   "title": "Technical Product Manager",
   "company": "Horizon Systems",
   "summary": "Horizon Systems is looking for a technical product manager to guide workflow products from early discovery through delivery and improvement. You will speak with customers, define measurable outcomes, maintain the roadmap, and coordinate design and engineering work. The role requires commercial judgment, clear technical communication, and confidence balancing competing stakeholder needs.",
@@ -7,6 +10,7 @@
   "required_qualifications": ["plan product management", "Product roadmapping", "Customer discovery", "use analytics for commercial purposes", "apply technical communication skills"],
   "preferred_qualifications": ["B2B SaaS", "design application interfaces", "Negotiation"],
   "minimum_education_level": "bachelors",
+  "minimum_experience_months": null,
   "required_skill_ids": [
     "29fb886c-6be0-4e93-9ea1-232881f2092a",
     "c14b6b74-96eb-58aa-87a7-86352df00d56",

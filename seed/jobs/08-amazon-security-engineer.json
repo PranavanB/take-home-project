@@ -1,5 +1,8 @@
 {
   "job_id": "62428c8b-da6d-4c7d-97df-916de86c6d8d",
+  "requirements_version": "job-requirements-v1",
+  "skill_catalog_version": "esco-1.2.1-onet-30.3-poc-v2",
+  "industry_catalog_version": "naics-2022-sector-v1",
   "title": "Software Development Engineer, Security",
   "company": "Amazon",
   "summary": "Join Amazon's security engineering organisation to build systems that help development teams create and release secure software at global scale. You will design dependable services, solve complex engineering problems, contribute to technical architecture, and improve tools used across the business. The work combines hands-on development with operational ownership and collaboration across multiple teams.",
@@ -21,6 +24,7 @@
     "Cloud security experience"
   ],
   "minimum_education_level": null,
+  "minimum_experience_months": null,
   "required_skill_ids": [
     "e9743453-bade-5831-bc8c-537100bbbca3",
     "f7e2eb04-3e50-4561-bce1-7e51a1fec308",

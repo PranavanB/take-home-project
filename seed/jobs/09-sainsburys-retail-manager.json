@@ -1,5 +1,8 @@
 {
   "job_id": "45295a1c-7782-489d-9ee6-3a6dfcbbea23",
+  "requirements_version": "job-requirements-v1",
+  "skill_catalog_version": "esco-1.2.1-onet-30.3-poc-v2",
+  "industry_catalog_version": "naics-2022-sector-v1",
   "title": "Customer and Trading Manager – Online",
   "company": "Sainsbury's",
   "summary": "Lead the online picking and delivery operation at Sainsbury's Cromwell Road store. You will organise early-morning activity, coach a large team of shoppers and drivers, monitor customer and operational targets, and coordinate with other store managers. The role also includes scheduling, performance management, employee relations, and responsibility for safe, reliable customer service.",
@@ -22,6 +25,7 @@
     "Early-morning operational availability"
   ],
   "minimum_education_level": null,
+  "minimum_experience_months": null,
   "required_skill_ids": [
     "d1e2272a-1573-5df4-93b2-2978771954c8",
     "cfbeac36-ae34-58e4-a67f-12d5e26731a9",

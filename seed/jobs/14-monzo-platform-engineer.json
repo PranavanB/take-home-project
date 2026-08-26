@@ -1,5 +1,8 @@
 {
   "job_id": "6856d2f9-45c1-47c2-869c-ad5e0232d555",
+  "requirements_version": "job-requirements-v1",
+  "skill_catalog_version": "esco-1.2.1-onet-30.3-poc-v2",
+  "industry_catalog_version": "naics-2022-sector-v1",
   "title": "Platform Engineer",
   "company": "Monzo",
   "summary": "Help build the cloud infrastructure and internal platform used by engineering teams across Monzo. You will improve Kubernetes environments, develop self-service tooling, automate infrastructure, and make production systems safer and easier to operate. The role combines software engineering with platform reliability and offers flexible working from a UK office or remotely within the country.",
@@ -21,6 +24,7 @@
     "Developer platform experience"
   ],
   "minimum_education_level": null,
+  "minimum_experience_months": null,
   "required_skill_ids": [
     "e9743453-bade-5831-bc8c-537100bbbca3",
     "bd14968e-e409-45af-b362-3495ed7b10e0",

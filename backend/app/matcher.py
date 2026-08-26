@@ -1,5 +1,6 @@
 import sqlite3
 from collections.abc import Iterable
+from fractions import Fraction
 from uuid import UUID, uuid5
 
 from app.domain import (
@@ -19,7 +20,14 @@ from app.domain import (
     SkillCatalog,
 )
 
-MATCHER_VERSION = "exact-database-matcher-v3"
+MATCHER_VERSION = "exact-database-matcher-v4"
+CATEGORY_WEIGHTS = {
+    MatchCategory.SKILLS: 40,
+    MatchCategory.EXPERIENCE: 25,
+    MatchCategory.EDUCATION: 15,
+    MatchCategory.LOCATION: 10,
+    MatchCategory.INDUSTRY: 10,
+}
 
 
 class MatchAnalyzer:
@@ -37,8 +45,16 @@ class MatchAnalyzer:
         profile: CandidateProfile,
         jobs: list[JobFixture],
     ) -> MatchResults:
+        requirements_version = validate_job_versions(
+            jobs,
+            skill_catalog_version=self.skill_catalog.version,
+            industry_catalog_version=self.industry_catalog.version,
+        )
         evidence, candidate_facts = build_candidate_facts(profile)
-        analysis_id = uuid5(profile.profile_id, f"{MATCHER_VERSION}:analysis")
+        analysis_id = uuid5(
+            profile.profile_id,
+            f"{MATCHER_VERSION}:{requirements_version}:analysis",
+        )
         matches = [
             self._analyze_job(
                 analysis_id=analysis_id,
@@ -52,9 +68,8 @@ class MatchAnalyzer:
         ranked = sorted(
             matches,
             key=lambda match: (
-                -match.required_coverage_points,
-                -match.preferred_coverage_points,
-                match.title.casefold(),
+                -match.required_rank_score,
+                -match.preferred_rank_score,
                 str(match.job_id),
             ),
         )
@@ -62,6 +77,7 @@ class MatchAnalyzer:
             analysis_id=analysis_id,
             profile_id=profile.profile_id,
             matcher_version=MATCHER_VERSION,
+            job_requirements_version=requirements_version,
             top_matches=ranked[:3],
         )
 
@@ -108,6 +124,14 @@ class MatchAnalyzer:
                 item.status == RequirementStatus.MET for item in preferred
             ),
             preferred_coverage_max=len(preferred),
+            required_rank_score=weighted_rank_score(
+                resolved,
+                RequirementImportance.REQUIRED,
+            ),
+            preferred_rank_score=weighted_rank_score(
+                resolved,
+                RequirementImportance.PREFERRED,
+            ),
             category_coverage=build_category_coverage(resolved),
             requirements=resolved,
         )
@@ -136,7 +160,7 @@ def build_job_requirements(
             JobRequirement(
                 requirement_id=uuid5(
                     job.job_id,
-                    f"{MATCHER_VERSION}:{importance}:{standard_key}",
+                    f"{MATCHER_VERSION}:{job.requirements_version}:{importance}:{standard_key}",
                 ),
                 text=text,
                 importance=importance,
@@ -160,6 +184,13 @@ def build_job_requirements(
             importance=RequirementImportance.REQUIRED,
             category=MatchCategory.SKILLS,
             standard_key=skill_key(skill_id),
+        )
+    if job.minimum_experience_months is not None:
+        append_requirement(
+            text=f"At least {format_experience(job.minimum_experience_months)} of experience",
+            importance=RequirementImportance.REQUIRED,
+            category=MatchCategory.EXPERIENCE,
+            standard_key=experience_key(job.minimum_experience_months),
         )
     append_requirement(
         text=f"Located in {job.country_code}",
@@ -238,6 +269,32 @@ def build_candidate_facts(
         evidence[evidence_id] = item
         facts[item.standard_key] = evidence_id
 
+    if profile.total_experience_months > 0:
+        references = [
+            reference
+            for experience in profile.experiences
+            if experience.start_date is not None
+            for reference in experience.evidence
+        ][:3]
+        if references:
+            evidence_id = uuid5(
+                profile.profile_id,
+                f"{MATCHER_VERSION}:experience:{profile.total_experience_months}",
+            )
+            item = CandidateEvidence(
+                evidence_id=evidence_id,
+                category=MatchCategory.EXPERIENCE,
+                standard_key=experience_key(profile.total_experience_months),
+                label=(
+                    f"{format_experience(profile.total_experience_months)} across dated CV roles "
+                    f"(as of {profile.experience_as_of.isoformat()})"
+                ),
+                references=references,
+            )
+            evidence[evidence_id] = item
+            for accepted_months in range(1, profile.total_experience_months + 1):
+                facts[experience_key(accepted_months)] = evidence_id
+
     if profile.industry is not None:
         evidence_id = uuid5(
             profile.profile_id,
@@ -301,6 +358,8 @@ def resolve_requirement(
     if evidence is not None:
         if requirement.category == MatchCategory.EDUCATION:
             explanation = f"{evidence.label} meets this minimum education level."
+        elif requirement.category == MatchCategory.EXPERIENCE:
+            explanation = f"{evidence.label} meets this minimum experience duration."
         elif requirement.category == MatchCategory.LOCATION:
             explanation = "The CV and job use the same ISO country code."
         elif requirement.category == MatchCategory.INDUSTRY:
@@ -318,6 +377,12 @@ def resolve_requirement(
     if requirement.category == MatchCategory.EDUCATION:
         explanation = "The CV does not show an education level that meets this minimum."
         action = f"Add truthful CV evidence of {requirement.text.casefold()} if applicable."
+    elif requirement.category == MatchCategory.EXPERIENCE:
+        explanation = (
+            f"The dated CV roles total {format_experience(profile.total_experience_months)}, "
+            "which does not meet this minimum."
+        )
+        action = "Make the start and end dates of relevant roles clear on your CV."
     elif requirement.category == MatchCategory.LOCATION:
         candidate_country = profile.country.country_code if profile.country else "not stated"
         explanation = f"The CV country ({candidate_country}) is not an exact ISO-code match."
@@ -349,6 +414,20 @@ def build_category_coverage(
     return [
         CategoryCoverage(
             category=category,
+            weight_percent=CATEGORY_WEIGHTS[category],
+            coverage_percent=(
+                round(
+                    100
+                    * sum(
+                        item.category == category
+                        and item.status == RequirementStatus.MET
+                        for item in items
+                    )
+                    / sum(item.category == category for item in items)
+                )
+                if any(item.category == category for item in items)
+                else 0
+            ),
             met=sum(
                 item.category == category and item.status == RequirementStatus.MET
                 for item in items
@@ -362,12 +441,63 @@ def build_category_coverage(
     ]
 
 
+def weighted_rank_score(
+    requirements: Iterable[RequirementMatch],
+    importance: RequirementImportance,
+) -> int:
+    items = [item for item in requirements if item.importance == importance]
+    applicable_weight = 0
+    weighted_coverage = Fraction(0)
+    for category, weight in CATEGORY_WEIGHTS.items():
+        category_items = [item for item in items if item.category == category]
+        if not category_items:
+            continue
+        applicable_weight += weight
+        met = sum(item.status == RequirementStatus.MET for item in category_items)
+        weighted_coverage += Fraction(met, len(category_items)) * weight
+    if applicable_weight == 0:
+        return 0
+    score = weighted_coverage / applicable_weight * 10_000
+    return int(score + Fraction(1, 2))
+
+
+def validate_job_versions(
+    jobs: list[JobFixture],
+    *,
+    skill_catalog_version: str,
+    industry_catalog_version: str,
+) -> str:
+    versions = {job.requirements_version for job in jobs}
+    if len(versions) != 1:
+        raise ValueError("All matched jobs must use one requirements version")
+    if any(job.skill_catalog_version != skill_catalog_version for job in jobs):
+        raise ValueError("Job and runtime skill catalog versions do not match")
+    if any(job.industry_catalog_version != industry_catalog_version for job in jobs):
+        raise ValueError("Job and runtime industry catalog versions do not match")
+    return versions.pop()
+
+
 def skill_key(skill_id: UUID) -> str:
     return f"skill:{skill_id}"
 
 
 def education_key(level: EducationLevel) -> str:
     return f"education:{level}"
+
+
+def experience_key(months: int) -> str:
+    return f"experience-months:{months}"
+
+
+def format_experience(months: int) -> str:
+    years, remainder = divmod(months, 12)
+    if years and remainder:
+        year_label = f"{years} year{'s' if years != 1 else ''}"
+        month_label = f"{remainder} month{'s' if remainder != 1 else ''}"
+        return f"{year_label} {month_label}"
+    if years:
+        return f"{years} year{'s' if years != 1 else ''}"
+    return f"{months} month{'s' if months != 1 else ''}"
 
 
 def country_key(country_code: str) -> str:

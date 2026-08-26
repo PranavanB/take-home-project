@@ -33,6 +33,8 @@ interface CandidateExperience {
 interface CandidateProfile {
   profile_id: string;
   resume_id: string;
+  experience_as_of: string;
+  total_experience_months: number;
   featured_experience_id: string | null;
   experiences: CandidateExperience[];
   skills: Array<{ skill_id: string; name: string }>;
@@ -63,7 +65,7 @@ interface CandidateProfile {
   } | null;
 }
 
-type MatchCategory = "education" | "skills" | "location" | "industry";
+type MatchCategory = "education" | "skills" | "experience" | "location" | "industry";
 type RequirementStatus = "met" | "missing";
 
 interface RequirementMatch {
@@ -86,8 +88,12 @@ interface JobMatch {
   required_coverage_max: number;
   preferred_coverage_points: number;
   preferred_coverage_max: number;
+  required_rank_score: number;
+  preferred_rank_score: number;
   category_coverage: Array<{
     category: MatchCategory;
+    weight_percent: number;
+    coverage_percent: number;
     met: number;
     missing: number;
   }>;
@@ -107,6 +113,7 @@ interface AvailableJob {
   required_qualifications: string[];
   preferred_qualifications: string[];
   minimum_education_level: "secondary" | "vocational" | "bachelors" | "masters" | "doctorate" | null;
+  minimum_experience_months: number | null;
   country_code: string;
   industry_label: string;
   location_label: string | null;
@@ -140,6 +147,7 @@ const stagePosition: Record<ProcessingStage, number> = {
 const categoryLabel: Record<MatchCategory, string> = {
   education: "Education",
   skills: "Skills",
+  experience: "Experience",
   location: "Location",
   industry: "Industry",
 };
@@ -157,6 +165,17 @@ const educationLabel = {
   masters: "Master's degree",
   doctorate: "Doctorate",
 };
+
+function formatExperience(months: number): string {
+  const years = Math.floor(months / 12);
+  const remainingMonths = months % 12;
+  const parts = [];
+  if (years) parts.push(`${years} ${years === 1 ? "year" : "years"}`);
+  if (remainingMonths) {
+    parts.push(`${remainingMonths} ${remainingMonths === 1 ? "month" : "months"}`);
+  }
+  return parts.join(" ") || "Not enough dated experience to calculate";
+}
 
 function countryName(countryCode: string) {
   try {
@@ -305,6 +324,9 @@ function AvailableJobsPage({ onBack }: { onBack: () => void }) {
                     <span>{job.minimum_education_level
                       ? educationLabel[job.minimum_education_level]
                       : "No degree requirement stated"}</span>
+                    <span>{job.minimum_experience_months
+                      ? `Minimum ${formatExperience(job.minimum_experience_months)} experience`
+                      : "No minimum duration stated"}</span>
                     {job.source_url && (
                       <a href={job.source_url} target="_blank" rel="noreferrer">
                         View original listing <span aria-hidden="true">↗</span>
@@ -605,6 +627,16 @@ export default function App() {
               </section>
 
               <section className="profile-section">
+                <h2>Dated experience</h2>
+                {profile.total_experience_months > 0 ? (
+                  <>
+                    <h3>{formatExperience(profile.total_experience_months)}</h3>
+                    <p>Calculated from non-overlapping role dates in this CV.</p>
+                  </>
+                ) : <p>No complete employment date ranges found.</p>}
+              </section>
+
+              <section className="profile-section">
                 <h2>Location</h2>
                 {profile.country ? (
                   <>
@@ -707,8 +739,8 @@ export default function App() {
                           </div>
                           {selectedMatch.category_coverage.map((coverage) => (
                             <div key={coverage.category}>
-                              <span>{categoryLabel[coverage.category]}</span>
-                              <strong>{coverage.met} met · {coverage.missing} missing</strong>
+                              <span>{categoryLabel[coverage.category]} · {coverage.weight_percent}% ranking weight</span>
+                              <strong>{coverage.coverage_percent}% · {coverage.met} met · {coverage.missing} missing</strong>
                             </div>
                           ))}
                         </div>

@@ -25,6 +25,18 @@ def test_standard_dataset_has_sixteen_unique_jobs_including_ten_sourced_roles() 
     assert len(set(poc_locations)) == 6
     assert all(set(job.required_skill_ids) <= skill_ids for job in jobs)
     assert all(set(job.preferred_skill_ids) <= skill_ids for job in jobs)
+    assert {job.requirements_version for job in jobs} == {"job-requirements-v1"}
+    assert {job.skill_catalog_version for job in jobs} == {skills.version}
+    assert {job.industry_catalog_version for job in jobs} == {industries.version}
+    assert {
+        job.title: job.minimum_experience_months
+        for job in jobs
+        if job.minimum_experience_months is not None
+    } == {
+        "Registered Nurse": 6,
+        "Cabin Crew – Talent Pool": 12,
+        "Senior Product Manager": 24,
+    }
     assert sum(skill.source == SkillSource.ONET for skill in skills.skills) == 15
     assert len(industries.industries) == 20
     assert len({industry.naics_code for industry in industries.industries}) == 20

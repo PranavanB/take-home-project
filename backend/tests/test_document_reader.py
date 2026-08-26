@@ -1,3 +1,4 @@
+from datetime import date
 from pathlib import Path
 from uuid import uuid4
 
@@ -135,6 +136,8 @@ async def test_worker_writes_extraction_then_deletes_original(tmp_path) -> None:
         profile_id=uuid4(),
         resume_id=completed.resume_id,
         extractor_version="crash-recovery-test",
+        experience_as_of=date(2026, 8, 26),
+        total_experience_months=0,
         featured_experience_id=None,
         experiences=[],
         skills=[],

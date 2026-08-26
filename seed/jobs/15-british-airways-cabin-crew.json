@@ -1,5 +1,8 @@
 {
   "job_id": "6334574a-656a-48d7-890d-534bf5e03317",
+  "requirements_version": "job-requirements-v1",
+  "skill_catalog_version": "esco-1.2.1-onet-30.3-poc-v2",
+  "industry_catalog_version": "naics-2022-sector-v1",
   "title": "Cabin Crew – Talent Pool",
   "company": "British Airways",
   "summary": "Join the British Airways talent pool for future cabin crew opportunities based at London airports. Cabin crew deliver welcoming passenger service while following strict safety, security, and operational procedures. The work requires calm decisions under pressure, clear and empathetic communication, resilience, teamwork, and the flexibility to support travellers from many different backgrounds.",
@@ -22,6 +25,7 @@
     "Experience handling unexpected customer needs"
   ],
   "minimum_education_level": null,
+  "minimum_experience_months": 12,
   "required_skill_ids": [
     "3ddaa272-a4ba-59c9-a06a-13625f5ae87d",
     "b20ae074-e72c-54eb-9e76-4402b2dd1321",

@@ -1,5 +1,8 @@
 {
   "job_id": "bfdd4b8a-ce15-4b9b-92c3-ef4698adca4f",
+  "requirements_version": "job-requirements-v1",
+  "skill_catalog_version": "esco-1.2.1-onet-30.3-poc-v2",
+  "industry_catalog_version": "naics-2022-sector-v1",
   "title": "Platform Engineer",
   "company": "Cloud Forge",
   "summary": "Cloud Forge is hiring a platform engineer to make software delivery safer, faster, and easier for its product teams. You will operate Kubernetes environments, automate cloud infrastructure with Terraform, and improve continuous-delivery pipelines. The role includes responding to operational problems, removing repetitive work, and building reliable self-service tools for other engineers.",
@@ -7,6 +10,7 @@
   "required_qualifications": ["Kubernetes", "Terraform", "DevOps", "use digital device operating systems", "cloud technologies"],
   "preferred_qualifications": ["Docker", "Python (computer programming)", "Systems Evaluation"],
   "minimum_education_level": "bachelors",
+  "minimum_experience_months": null,
   "required_skill_ids": [
     "5a196e0c-1217-57fb-a1a4-866c2bacb64e",
     "58c8eb8d-e236-5b52-8276-78800084f236",

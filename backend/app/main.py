@@ -8,7 +8,6 @@ from fastapi import FastAPI
 from app.catalog import load_industry_catalog, load_job_dataset, load_skill_catalog
 from app.config import Settings, get_settings
 from app.gateway import OpenAIEmbeddingGateway, VLLMProfileDraftGenerator
-from app.job_skill_extractor import JobSkillNormalizer
 from app.matcher import MatchAnalyzer
 from app.profile_extractor import ProfileDraftGenerator, ProfileExtractor
 from app.routes.jobs import router as jobs_router
@@ -53,11 +52,6 @@ def create_app(
         if resolved.embedding_base_url
         else None
     )
-    job_skill_normalizer = (
-        JobSkillNormalizer(generator=resolved_profile_generator, mapper=skill_mapper)
-        if skill_mapper is not None
-        else None
-    )
     match_analyzer = MatchAnalyzer(skill_catalog, industry_catalog)
 
     @asynccontextmanager
@@ -80,7 +74,6 @@ def create_app(
                 skill_mapper,
             ),
             match_analyzer=match_analyzer,
-            job_skill_normalizer=job_skill_normalizer,
             jobs=app.state.jobs,
         )
         cleanup_task = asyncio.create_task(cleanup_loop(app.state.session_store))
@@ -108,6 +101,7 @@ def create_app(
             "skill_catalog_version": app.state.skill_catalog.version,
             "industry_count": len(app.state.industry_catalog.industries),
             "industry_catalog_version": app.state.industry_catalog.version,
+            "job_requirements_version": app.state.jobs[0].requirements_version,
             "skill_mapping_method": (
                 "exact_alias_then_vector" if skill_mapper is not None else "exact_alias"
             ),

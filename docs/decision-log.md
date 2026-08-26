@@ -7,15 +7,19 @@ is marked **Rationale to confirm** instead of being guessed.
 
 ## Product experience
 
-### One-action welcome page
+### Focused welcome page
 
-**Decision:** The first screen says “Welcome to Job Matcher” and has one primary action:
-**Upload your resume**.
+**Decision:** The first screen says “Welcome to Job Matcher”, has one primary action—
+**Upload your resume**—and a secondary **View available jobs** action that opens the
+searchable 16-role catalogue.
 
 **Product-owner reason:** Keep the application and its purpose immediately understandable.
+The ability to inspect the available jobs before uploading was subsequently requested;
+the product reason for that secondary path has not been separately stated.
 
 **Implementation:** The React interface accepts PDF or DOCX files and moves directly to a
-three-stage processing screen.
+three-stage processing screen. The jobs route is read-only and uses the same fixtures as
+the matcher.
 
 ### Automatic progression with no edit or confirmation step
 
@@ -37,8 +41,9 @@ matches, where it does not, and truthful actions that could close each documente
 **Product-owner reason:** Deliver one small, focused outcome rather than a general job-search
 platform.
 
-**Engineering implementation:** Six read-only job fixtures give enough candidates to rank a
-top three without building job ingestion, administration, or external search.
+**Engineering implementation:** Sixteen read-only job fixtures—six synthetic roles and ten
+employer-sourced roles—give enough candidates to rank a top three across several sectors
+without building job ingestion, administration, or external search.
 
 ### Simple processing feedback
 
@@ -146,16 +151,23 @@ are discarded.
 
 ## Standard categories
 
-### Four comparison categories
+### Five comparison categories
 
-**Decision:** Keep comparison to Education level, Skills, Location at country level, and
-Industry.
+**Decision:** Keep comparison to Education level, Skills, total dated Experience, Location
+at country level, and Industry.
 
 **Product-owner reason:** Keep matching simple and standard enough for a one-to-one database
 comparison.
 
 **Implementation:** Education maps to EQF levels 4–8, location to ISO country codes, industry
-to 2022 NAICS sectors, and skills to stable catalogue UUIDs.
+to 2022 NAICS sectors, skills to stable catalogue UUIDs, and dated employment periods to a
+non-overlapping total number of months. Job experience minima become exact month keys.
+
+**Experience boundary:** The skill-extraction pass reads employment history, role
+descriptions, and responsibilities as well as any Skills section. The POC duration is total
+dated employment; relevant skill UUIDs remain separate required facts. Production should
+associate durations with specific roles, skills, and domains before claiming, for example,
+"three years of nursing" rather than three years of work in general.
 
 ### ESCO, O*NET, NAICS, and local extensions
 
@@ -172,8 +184,9 @@ current scope.
 
 ### LLM extraction followed by semantic mapping
 
-**Decision:** Extract all explicit skills from both CVs and jobs with the LLM, then map those
-phrases to the standard catalogue with vectors.
+**Decision:** Extract all explicit CV skills with the LLM, then map those phrases to the
+standard catalogue with vectors. Job adverts follow the same extraction and mapping design
+at ingestion time, not every time a candidate uploads a CV.
 
 **Engineering interpretation:** Free-text CVs and job descriptions use different wording
 even when they refer to the same skill, so exact string aliases alone are too conservative.
@@ -219,24 +232,31 @@ Arctic 2.0 family rather than a particular size.
 **Decision:** Matching itself is a one-to-one database comparison of standardized facts.
 
 **Implementation:** A temporary in-memory SQLite database joins identical skill UUIDs,
-education keys, ISO country codes, and NAICS industry UUIDs. A higher education level also
-satisfies each lower minimum. Every result is either **Met** or **Missing**; there is no
-partial state.
+education keys, experience-month thresholds, ISO country codes, and NAICS industry UUIDs.
+A higher education level also satisfies each lower minimum, and a longer dated work history
+satisfies each lower month threshold. Every result is either **Met** or **Missing**; there is
+no partial state.
 
 **Engineering reason:** The same inputs produce the same result, and neither the LLM nor the
 embedding model can inflate a fit decision after standardization.
 
 ### Current weighting
 
-**Decision implemented:** Required matches determine ranking before preferred matches.
-Within those groups, each documented requirement currently contributes one count. Stable
-title and UUID ordering resolve final ties.
+**Decision implemented:** Required category coverage determines ranking before preferred
+category coverage. The explicit POC weights are Skills 40%, Experience 25%, Education 15%,
+Location 10%, and Industry 10%. Each category is scored as its own proportion before the
+weights are applied, so adding more skill rows does not silently increase the category's
+importance. Weights for categories not present in a particular job are excluded and the
+remaining weights are normalized. The UI shows each category's percentage, Met/Missing
+counts, and ranking weight.
 
-**Future scoring intent:** The product owner ultimately wants all three layers: required
-versus preferred weighting, different category weights, and one overall normalized
-percentage. The formula, actual weights, interpretation, and evaluation are deliberately
-pinned for a separate scoring review. They are not part of the current implementation or
-presented as settled policy. The UI currently shows numeric Met/Missing category counts.
+**Title rule:** Job titles are retained for display but never used as evidence or ranking
+signals because employers can invent or inconsistently apply them. Exact ties use only the
+stable job UUID.
+
+**Future scoring intent:** Required-versus-preferred numerical weights and a customer-facing
+overall fit percentage remain pinned for a separate review with labelled examples. The POC
+category weights are explicit and testable, but they are not presented as universal policy.
 
 ## Reliability and safety
 
@@ -247,8 +267,9 @@ session remains active.
 
 **Implementation:** Each completed stage is atomically saved. A lease prevents simultaneous
 workers, expired leases are reclaimed after restart, and transient failures retry up to three
-times. A restarted matching stage may re-extract bundled job skills because that cache is
-intentionally process-memory only.
+times. Bundled job requirements are saved in their fixture files with a requirements version
+plus the exact skill- and industry-catalogue versions. Matching reads those persisted records
+directly, so a restart cannot cause the LLM to reinterpret a job differently.
 
 **Engineering reason:** A model or container restart should not force the user to upload the
 CV again or repeat already completed document work.
@@ -263,20 +284,25 @@ the score misleading.
 
 ## Current verification and runtime state
 
-As of 22 August 2026:
+As of 26 August 2026:
 
-- 38 backend tests pass, with one dependency deprecation warning.
+- 44 backend tests pass, with one dependency deprecation warning.
 - Backend lint and the frontend production build pass.
 - Arctic Embed 2.0 Medium returned ordered 768-dimensional vectors through the live CPU
   service.
 - Synthetic calibration accepted clear paraphrases and rejected ambiguous or unrelated
   examples using the current cutoffs.
-- A full post-Arctic synthetic upload was started but intentionally interrupted before
-  completion when the GPU was needed for other work; it is not recorded as an end-to-end
-  pass.
-- The Job Matcher vLLM container and ComfyUI were stopped to release GPU memory.
-- The frontend, API, and CPU-only Arctic service remain running. Uploads cannot complete
-  model extraction until vLLM is started again.
+- On 26 August, vLLM and Arctic both reached healthy status; vLLM exposed
+  `job-matcher-llm`, and the host reported approximately 29,920 MiB GPU memory in use.
+- The current five-category, persisted-job end-to-end route is not yet recorded as passed.
+  An earlier post-Arctic run was interrupted, and the 26 August browser rerun reached model
+  readiness but did not submit its synthetic PDF because the automated in-app file chooser
+  did not expose a file-selection event before the GPU shutdown request.
+- The Job Matcher vLLM and CPU-only Arctic containers are now stopped. The frontend and API
+  remain running, and the API health contract reports 16 jobs, 56 skills, and 20 industries.
+- ComfyUI and its Python process were deliberately left running. After the Job Matcher model
+  services stopped, total GPU use was approximately 3,113 MiB. New CV processing cannot
+  complete until both Job Matcher model services are restarted.
 
 ## Deliberately deferred
 
@@ -285,7 +311,16 @@ As of 22 August 2026:
 - User accounts and production retention controls.
 - User-supplied job descriptions and job administration.
 - Detailed location, remote-work, visa, and relocation rules.
+- Matching certifications, professional qualifications, and licences. The POC extracts these
+  facts, but production should compare regulated or role-specific credentials.
+- Broad cross-sector skill-taxonomy coverage. The 56-concept list is sufficient for this
+  fixed dataset but is not a general labour-market catalogue.
 - Large-catalogue retrieval and cross-encoder reranking.
-- The separately pinned scoring review: importance weights, category weights, and the
-  normalized overall percentage.
+- The separately pinned scoring review: required/preferred importance weights, validation of
+  the current category weights, and the normalized overall percentage.
 - A labelled evaluation set large enough to tune mapping or scoring policy.
+- Review of the Arctic similarity and runner-up thresholds against labelled CV/job phrases.
+
+Country-only location and top-level NAICS industry matching are accepted simplifications for
+this POC. Production should support city/distance, remote, visa, relocation, and more precise
+industry rules.

@@ -1,5 +1,8 @@
 {
   "job_id": "14e2545b-a8f5-4ca5-b099-0c22cd0ffed4",
+  "requirements_version": "job-requirements-v1",
+  "skill_catalog_version": "esco-1.2.1-onet-30.3-poc-v2",
+  "industry_catalog_version": "naics-2022-sector-v1",
   "title": "Senior Data Analyst",
   "company": "Insight Works",
   "summary": "Insight Works is seeking a senior data analyst to turn product and commercial information into practical business decisions. You will define trustworthy metrics, analyse experiments, investigate changes in performance, and present clear recommendations to senior stakeholders. The work combines hands-on SQL analysis with careful interpretation, visual communication, and constructive challenge of assumptions.",
@@ -7,6 +10,7 @@
   "required_qualifications": ["SQL", "perform data analysis", "deliver visual presentation of data", "communicate with stakeholders", "Experiment analysis"],
   "preferred_qualifications": ["Python (computer programming)", "Tableau", "Judgment and Decision Making"],
   "minimum_education_level": "bachelors",
+  "minimum_experience_months": null,
   "required_skill_ids": [
     "598de5b0-5b58-4ea7-8058-a4bc4d18c742",
     "2b92a5b2-6758-4ee3-9fb4-b6387a55cc8f",

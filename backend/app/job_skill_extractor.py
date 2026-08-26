@@ -40,12 +40,8 @@ class JobSkillNormalizer:
     ) -> None:
         self.generator = generator
         self.mapper = mapper
-        self._cache: dict[UUID, JobFixture] = {}
 
     async def normalize(self, job: JobFixture) -> JobFixture:
-        cached = self._cache.get(job.job_id)
-        if cached is not None:
-            return cached
         payload = await self.generator.generate(
             system_prompt=SYSTEM_PROMPT,
             user_prompt=build_job_prompt(job),
@@ -71,7 +67,6 @@ class JobSkillNormalizer:
                 "preferred_skill_ids": preferred_ids,
             }
         )
-        self._cache[job.job_id] = normalized
         return normalized
 
     async def normalize_all(self, jobs: list[JobFixture]) -> list[JobFixture]:
@@ -80,7 +75,6 @@ class JobSkillNormalizer:
 
 def build_job_prompt(job: JobFixture) -> str:
     source = {
-        "title": job.title,
         "summary": job.summary,
         "responsibilities": job.responsibilities,
         "required_qualifications": job.required_qualifications,

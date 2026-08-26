@@ -1,4 +1,5 @@
 import re
+from datetime import date
 from enum import StrEnum
 from typing import Annotated
 from uuid import UUID
@@ -214,6 +215,8 @@ class CandidateProfile(StrictProfileModel):
     profile_id: UUID
     resume_id: UUID
     extractor_version: str
+    experience_as_of: date
+    total_experience_months: int = Field(ge=0, le=1200)
     featured_experience_id: UUID | None
     experiences: list[CandidateExperience]
     skills: list[CandidateSkill]

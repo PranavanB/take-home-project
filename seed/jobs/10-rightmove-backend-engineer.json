@@ -1,5 +1,8 @@
 {
   "job_id": "fd623e0c-418a-4da1-9d02-26f73ebd8eaf",
+  "requirements_version": "job-requirements-v1",
+  "skill_catalog_version": "esco-1.2.1-onet-30.3-poc-v2",
+  "industry_catalog_version": "naics-2022-sector-v1",
   "title": "Senior Software Engineer I – Backend",
   "company": "Rightmove",
   "summary": "Rightmove is seeking a senior backend engineer to develop reliable services and customer tooling for its property platform. You will work primarily with modern Java and Spring technologies, help shape technical decisions, and improve systems that serve a large UK audience. The role includes collaborative delivery, testing, mentoring, and ownership of production quality.",
@@ -21,6 +24,7 @@
     "Quality engineering practices"
   ],
   "minimum_education_level": null,
+  "minimum_experience_months": null,
   "required_skill_ids": [
     "e9743453-bade-5831-bc8c-537100bbbca3",
     "f7e2eb04-3e50-4561-bce1-7e51a1fec308",

@@ -1,5 +1,8 @@
 {
   "job_id": "4c85afc1-119b-4cac-bbe0-4ee6dfa64233",
+  "requirements_version": "job-requirements-v1",
+  "skill_catalog_version": "esco-1.2.1-onet-30.3-poc-v2",
+  "industry_catalog_version": "naics-2022-sector-v1",
   "title": "Chef de Partie",
   "company": "Novotel London Blackfriars",
   "summary": "Join the kitchen team at Novotel London Blackfriars and take responsibility for a designated section during service. You will prepare food consistently, control ingredient quality, manage stock and waste, and keep the section organised. The role also involves supporting senior chefs, helping junior colleagues develop, and creating an enjoyable experience for hotel and restaurant guests.",
@@ -22,6 +25,7 @@
     "Experience coaching junior chefs"
   ],
   "minimum_education_level": null,
+  "minimum_experience_months": null,
   "required_skill_ids": [
     "73a9c711-20d9-5dc8-bbe5-88d40f7845e5",
     "254b832b-ffb2-5085-9d47-a041af8e39b2",

@@ -2,6 +2,7 @@ import json
 import re
 import unicodedata
 from collections.abc import Iterable
+from datetime import date
 from typing import Any, Protocol
 from uuid import UUID, uuid5
 
@@ -30,7 +31,7 @@ from app.domain import (
 )
 from app.skill_mapper import SkillMapping, SkillVectorMapper
 
-EXTRACTOR_VERSION = "candidate-profile-v5"
+EXTRACTOR_VERSION = "candidate-profile-v6"
 PROFILE_CATEGORIES = (
     "experiences",
     "skills",
@@ -142,6 +143,13 @@ def build_user_prompt(document: ExtractedDocument, *, category: str | None = Non
             "Extract one concise item for each explicitly supported job. Set highlights "
             "to an empty array for this POC profile. Include exactly one short evidence "
             "quote per job. "
+        )
+    elif category == "skills":
+        focus = (
+            "Extract every explicitly supported skill from the whole CV, including skills "
+            "demonstrated in employment history, role descriptions, and responsibilities; "
+            "do not rely only on a section labelled Skills. Include exactly one short "
+            "evidence quote per item. "
         )
     elif category == "country":
         focus = (
@@ -410,7 +418,9 @@ def build_candidate_profile(
     *,
     skill_catalog: SkillCatalog | None = None,
     industry_catalog: IndustryCatalog | None = None,
+    as_of: date | None = None,
 ) -> CandidateProfile:
+    experience_as_of = as_of or date.today()
     profile_id = uuid5(resume_id, EXTRACTOR_VERSION)
     ordered_experiences = sorted(draft.experiences, key=_experience_sort_key, reverse=True)
     skills = _deduplicate_skills(draft.skills)
@@ -468,6 +478,11 @@ def build_candidate_profile(
         profile_id=profile_id,
         resume_id=resume_id,
         extractor_version=EXTRACTOR_VERSION,
+        experience_as_of=experience_as_of,
+        total_experience_months=calculate_total_experience_months(
+            ordered_experiences,
+            as_of=experience_as_of,
+        ),
         featured_experience_id=experiences[0].experience_id if experiences else None,
         experiences=experiences,
         skills=candidate_skills,
@@ -478,6 +493,56 @@ def build_candidate_profile(
         qualifications=candidate_qualifications,
         education=candidate_education,
     )
+
+
+def calculate_total_experience_months(
+    experiences: Iterable[ExperienceDraft],
+    *,
+    as_of: date,
+) -> int:
+    """Count the union of dated employment months without double-counting overlaps."""
+    as_of_end = as_of.year * 12 + as_of.month
+    intervals: list[tuple[int, int]] = []
+    for experience in experiences:
+        if experience.start_date is None:
+            continue
+        start = _experience_month_index(experience.start_date, end_boundary=False)
+        end = (
+            as_of_end
+            if experience.is_current
+            else _experience_month_index(experience.end_date, end_boundary=True)
+            if experience.end_date is not None
+            else None
+        )
+        if end is None:
+            continue
+        end = min(end, as_of_end)
+        if start >= end:
+            continue
+        intervals.append((start, end))
+
+    total = 0
+    merged_start: int | None = None
+    merged_end: int | None = None
+    for start, end in sorted(intervals):
+        if merged_start is None:
+            merged_start, merged_end = start, end
+            continue
+        if start <= merged_end:
+            merged_end = max(merged_end, end)
+            continue
+        total += merged_end - merged_start
+        merged_start, merged_end = start, end
+    if merged_start is not None and merged_end is not None:
+        total += merged_end - merged_start
+    return min(total, 1200)
+
+
+def _experience_month_index(value: str, *, end_boundary: bool) -> int:
+    year, _, month = value.partition("-")
+    resolved_month = int(month) if month else (12 if end_boundary else 1)
+    month_index = int(year) * 12 + resolved_month - 1
+    return month_index + int(end_boundary)
 
 
 def _standardize_industry(

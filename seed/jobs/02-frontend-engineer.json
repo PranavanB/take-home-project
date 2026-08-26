@@ -1,5 +1,8 @@
 {
   "job_id": "e0596a50-2bf8-40ee-9ce5-0d93c7291c89",
+  "requirements_version": "job-requirements-v1",
+  "skill_catalog_version": "esco-1.2.1-onet-30.3-poc-v2",
+  "industry_catalog_version": "naics-2022-sector-v1",
   "title": "Frontend Engineer",
   "company": "Northstar Digital",
   "summary": "Northstar Digital is looking for a frontend engineer to create clear, accessible experiences for a consumer finance product. You will develop React and TypeScript features, improve the shared design system, and test important customer journeys. The team values thoughtful interaction design, inclusive standards, dependable delivery, and close collaboration with product and design colleagues.",
@@ -7,6 +10,7 @@
   "required_qualifications": ["React", "TypeScript", "CSS", "Frontend testing", "ICT accessibility standards"],
   "preferred_qualifications": ["Vite", "Playwright", "Quality Control Analysis"],
   "minimum_education_level": "bachelors",
+  "minimum_experience_months": null,
   "required_skill_ids": [
     "fd97e6ec-dfa1-5b88-9c97-d88b8948592a",
     "867137fb-ff1b-4ca3-99f3-cb6969aa2c68",

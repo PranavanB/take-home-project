@@ -21,6 +21,7 @@ def list_available_jobs(request: Request) -> list[AvailableJob]:
             required_qualifications=job.required_qualifications,
             preferred_qualifications=job.preferred_qualifications,
             minimum_education_level=job.minimum_education_level,
+            minimum_experience_months=job.minimum_experience_months,
             country_code=job.country_code,
             industry_label=industries[job.industry_id],
             location_label=job.location_label,

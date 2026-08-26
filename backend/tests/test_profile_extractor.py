@@ -1,3 +1,4 @@
+from datetime import date
 from pathlib import Path
 from typing import Any
 from uuid import uuid4, uuid5
@@ -9,6 +10,8 @@ from app.catalog import load_industry_catalog, load_skill_catalog
 from app.domain import (
     DocumentType,
     EducationLevel,
+    EvidenceReference,
+    ExperienceDraft,
     ExtractedBlock,
     ExtractedDocument,
     SkillMappingMethod,
@@ -18,6 +21,7 @@ from app.profile_extractor import (
     _canonical_source_excerpt,
     build_category_schema,
     build_user_prompt,
+    calculate_total_experience_months,
 )
 from app.skill_mapper import SkillVectorMapper
 
@@ -111,6 +115,42 @@ def test_experience_request_uses_bounded_concise_contract() -> None:
     )
     assert schema["$defs"]["ExperienceDraft"]["properties"]["evidence"]["maxItems"] == 1
     assert schema["$defs"]["EvidenceReference"]["properties"]["quote"]["maxLength"] == 240
+
+
+def test_skill_request_explicitly_includes_work_history() -> None:
+    prompt = build_user_prompt(make_document(), category="skills")
+
+    assert "employment history" in prompt
+    assert "responsibilities" in prompt
+
+
+def test_total_experience_months_merges_overlapping_roles() -> None:
+    reference = EvidenceReference(block_id=uuid4(), quote="Grounded CV evidence")
+    roles = [
+        ExperienceDraft(
+            title="First role",
+            company="One",
+            start_date="2020-01",
+            end_date="2021-12",
+            evidence=[reference],
+        ),
+        ExperienceDraft(
+            title="Overlapping role",
+            company="Two",
+            start_date="2021-01",
+            end_date="2022-12",
+            evidence=[reference],
+        ),
+        ExperienceDraft(
+            title="Current role",
+            company="Three",
+            start_date="2023-01",
+            is_current=True,
+            evidence=[reference],
+        ),
+    ]
+
+    assert calculate_total_experience_months(roles, as_of=date(2023, 12, 1)) == 48
 
 
 def test_repairs_only_formatting_differences_with_exact_source_excerpt() -> None:
@@ -273,6 +313,8 @@ async def test_extracts_grounded_profile_with_current_role_first_and_stable_ids(
     assert first.profile_id.version == 5
     assert first.experiences[0].company == "Cedar Systems"
     assert first.featured_experience_id == first.experiences[0].experience_id
+    assert first.total_experience_months > 0
+    assert first.experience_as_of == date.today()
     assert len(first.skills) == 2
     assert len(first.skills[0].evidence) == 2
     assert first.education[0].degree == "BSc Computer Science"

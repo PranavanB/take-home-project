@@ -89,6 +89,9 @@ class SessionSummary(BaseModel):
 
 class JobFixture(BaseModel):
     job_id: UUID
+    requirements_version: str = Field(min_length=1, max_length=100)
+    skill_catalog_version: str = Field(min_length=1, max_length=100)
+    industry_catalog_version: str = Field(min_length=1, max_length=100)
     title: str
     company: str
     summary: str
@@ -96,6 +99,7 @@ class JobFixture(BaseModel):
     required_qualifications: list[str]
     preferred_qualifications: list[str]
     minimum_education_level: EducationLevel | None
+    minimum_experience_months: int | None = Field(default=None, ge=1, le=1200)
     required_skill_ids: list[UUID]
     preferred_skill_ids: list[UUID]
     country_code: str = Field(pattern=r"^[A-Z]{2}$")
@@ -117,6 +121,7 @@ class AvailableJob(BaseModel):
     required_qualifications: list[str]
     preferred_qualifications: list[str]
     minimum_education_level: EducationLevel | None
+    minimum_experience_months: int | None
     country_code: str = Field(pattern=r"^[A-Z]{2}$")
     industry_label: str
     location_label: str | None
