@@ -160,11 +160,11 @@ Explicit env files and Make targets make the run mode unambiguous:
 |---|---|---|
 | `docker compose --env-file .env.models --profile models up -d --build` | `.env.models` + `--profile models` | complete stack using vLLM and Arctic |
 
-The current Make targets validate configuration, start or stop vLLM, build the frontend,
-and run focused LLM smoke checks. The existing `up-models` shortcut does not yet name the
-embedding service, so the full Docker command above is the authoritative complete-stack
-command. `LLM_BASE_URL`, `LLM_MODEL`, `EMBEDDING_BASE_URL`, and `EMBEDDING_MODEL` drive the
-active model connections.
+The Make targets validate configuration, pull both model images, build and start the API,
+frontend, vLLM, and Arctic together, stop both model services together, build the frontend,
+and run focused LLM smoke checks. The full Docker command above and `make up-models` are
+equivalent complete-stack startup paths. `LLM_BASE_URL`, `LLM_MODEL`,
+`EMBEDDING_BASE_URL`, and `EMBEDDING_MODEL` drive the active model connections.
 
 ---
 

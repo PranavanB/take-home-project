@@ -204,10 +204,9 @@ requirements and the jobs catalogue do not need either model service. This is an
 state, not an application failure. ComfyUI and its Python process remain running as requested;
 after the Job Matcher model services stopped, total GPU use was approximately 3,113 MiB.
 
-Known command follow-up: the README's full `docker compose` command starts all four
-services. The existing `make up-models` shortcut currently omits the `embedding` service
-from its explicit target list and should be aligned before it is presented as the primary
-startup command.
+The model lifecycle shortcuts are aligned with the complete stack: `make up-models` builds
+and starts the API, frontend, vLLM, and Arctic; `make down-models` stops both model services
+while leaving the API and frontend available. `make pull-models` pulls both model images.
 
 The test-client dependency emits one deprecation warning from its compatibility layer;
 it does not affect application behaviour.

@@ -19,13 +19,13 @@ validate-models:
 	docker compose --env-file $(MODELS_ENV) --profile models config --quiet
 
 pull-models:
-	docker compose --env-file $(MODELS_ENV) --profile models pull vllm
+	docker compose --env-file $(MODELS_ENV) --profile models pull vllm embedding
 
 up-models:
-	docker compose --env-file $(MODELS_ENV) --profile models up -d vllm api frontend
+	docker compose --env-file $(MODELS_ENV) --profile models up -d --build vllm embedding api frontend
 
 down-models:
-	docker compose --env-file $(MODELS_ENV) --profile models stop vllm
+	docker compose --env-file $(MODELS_ENV) --profile models stop vllm embedding
 
 smoke-llm:
 	$(PYTHON) backend/scripts/smoke_llm_profile.py

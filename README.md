@@ -73,6 +73,13 @@ docker compose --env-file .env.models --profile models up -d --build
 The web interface is available at `http://127.0.0.1:5173/`. Model files and compiled
 kernels use Docker volumes, so normal container rebuilds do not download them again.
 
+If `make` is installed, the equivalent project shortcuts are:
+
+```powershell
+make up-models      # build/start the API, frontend, vLLM, and Arctic
+make down-models    # stop vLLM and Arctic while leaving the web app available
+```
+
 ## Local development
 
 Backend:
@@ -101,5 +108,8 @@ To release the GPU while leaving the API and frontend available for interface an
 work:
 
 ```powershell
-docker compose --env-file .env.models --profile models stop vllm embedding
+make down-models
 ```
+
+The equivalent direct Docker command is
+`docker compose --env-file .env.models --profile models stop vllm embedding`.
