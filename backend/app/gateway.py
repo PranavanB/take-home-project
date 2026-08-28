@@ -3,6 +3,8 @@ from typing import Any
 
 import httpx
 
+from app.domain import ChatMessage
+
 
 class LLMGatewayError(RuntimeError):
     """A safe, content-free error raised for unusable model responses."""
@@ -10,6 +12,10 @@ class LLMGatewayError(RuntimeError):
 
 class EmbeddingGatewayError(RuntimeError):
     """A safe, content-free error raised for unusable embedding responses."""
+
+
+class LLMChatError(RuntimeError):
+    """A safe, content-free error raised for unusable chat responses."""
 
 
 class VLLMProfileDraftGenerator:
@@ -77,6 +83,65 @@ class VLLMProfileDraftGenerator:
             return result
         except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
             raise LLMGatewayError("vLLM returned an unusable structured response") from exc
+
+
+class VLLMMatchChatGenerator:
+    """Answer questions about one standardized candidate/job match through vLLM."""
+
+    def __init__(
+        self,
+        *,
+        base_url: str,
+        model: str,
+        timeout_seconds: float = 300,
+        max_output_tokens: int = 1_024,
+        enable_thinking: bool = False,
+        transport: httpx.AsyncBaseTransport | None = None,
+    ) -> None:
+        self.base_url = base_url.rstrip("/")
+        self.model = model
+        self.timeout = httpx.Timeout(timeout_seconds)
+        self.max_output_tokens = max_output_tokens
+        self.enable_thinking = enable_thinking
+        self.transport = transport
+
+    async def generate(
+        self,
+        *,
+        system_prompt: str,
+        messages: list[ChatMessage],
+    ) -> str:
+        request = {
+            "model": self.model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                *[
+                    {"role": message.role.value, "content": message.content}
+                    for message in messages
+                ],
+            ],
+            "temperature": 0.2,
+            "max_tokens": self.max_output_tokens,
+            "chat_template_kwargs": {"enable_thinking": self.enable_thinking},
+        }
+        async with httpx.AsyncClient(
+            timeout=self.timeout,
+            transport=self.transport,
+        ) as client:
+            response = await client.post(
+                f"{self.base_url}/chat/completions",
+                json=request,
+            )
+            response.raise_for_status()
+            payload: dict[str, Any] = response.json()
+
+        try:
+            content = payload["choices"][0]["message"]["content"]
+            if not isinstance(content, str) or not content.strip():
+                raise TypeError
+            return content.strip()
+        except (KeyError, IndexError, TypeError) as exc:
+            raise LLMChatError("vLLM returned an unusable chat response") from exc
 
 
 class OpenAIEmbeddingGateway:

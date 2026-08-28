@@ -1,3 +1,9 @@
+from app.domain.chat import (
+    ChatMessage,
+    ChatRole,
+    MatchChatRequest,
+    MatchChatResponse,
+)
 from app.domain.matching import (
     CandidateEvidence,
     CategoryCoverage,
@@ -51,6 +57,8 @@ from app.domain.profile import (
 
 __all__ = [
     "AvailableJob",
+    "ChatMessage",
+    "ChatRole",
     "CandidateEvidence",
     "CategoryCoverage",
     "DocumentType",
@@ -78,6 +86,8 @@ __all__ = [
     "JobMatch",
     "JobRequirement",
     "MatchCategory",
+    "MatchChatRequest",
+    "MatchChatResponse",
     "MatchResults",
     "ProcessingStage",
     "QualificationDraft",

@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 
 type SessionStatus = "queued" | "processing" | "ready" | "failed" | "closing";
 type ProcessingStage = "queued" | "reading_cv" | "building_profile" | "finding_matches" | "ready" | "failed";
@@ -102,6 +102,19 @@ interface JobMatch {
 
 interface MatchResults {
   top_matches: JobMatch[];
+}
+
+type ChatRole = "user" | "assistant";
+
+interface ChatMessage {
+  message_id: string;
+  role: ChatRole;
+  content: string;
+}
+
+interface MatchChatResponse {
+  match_result_id: string;
+  message: ChatMessage;
 }
 
 interface AvailableJob {
@@ -353,6 +366,10 @@ export default function App() {
   const [profile, setProfile] = useState<CandidateProfile | null>(null);
   const [results, setResults] = useState<MatchResults | null>(null);
   const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
+  const [chatMessages, setChatMessages] = useState<Record<string, ChatMessage[]>>({});
+  const [chatQuestion, setChatQuestion] = useState("");
+  const [chatSending, setChatSending] = useState(false);
+  const [chatError, setChatError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [restoringSession, setRestoringSession] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -419,6 +436,9 @@ export default function App() {
       setProfile(null);
       setResults(null);
       setSelectedMatchId(null);
+      setChatMessages({});
+      setChatQuestion("");
+      setChatError(null);
     });
     events.onerror = () => undefined;
     return () => events.close();
@@ -471,6 +491,9 @@ export default function App() {
         setProfile(null);
         setResults(null);
         setSelectedMatchId(null);
+        setChatMessages({});
+        setChatQuestion("");
+        setChatError(null);
         if (inputRef.current) inputRef.current.value = "";
       }
     }
@@ -505,6 +528,9 @@ export default function App() {
       setProfile(null);
       setResults(null);
       setSelectedMatchId(null);
+      setChatMessages({});
+      setChatQuestion("");
+      setChatError(null);
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Upload failed");
     } finally {
@@ -522,6 +548,55 @@ export default function App() {
     if (window.location.pathname !== nextPath) window.history.pushState({}, "", nextPath);
     setView(nextView);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function askAboutMatch(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const question = chatQuestion.trim();
+    if (!session || !selectedMatchId || !question || chatSending) return;
+
+    const existing = chatMessages[selectedMatchId] ?? [];
+    const userMessage: ChatMessage = {
+      message_id: crypto.randomUUID(),
+      role: "user",
+      content: question,
+    };
+    const requestMessages = [...existing.slice(-8), userMessage];
+    setChatMessages((current) => ({
+      ...current,
+      [selectedMatchId]: [...existing, userMessage],
+    }));
+    setChatQuestion("");
+    setChatError(null);
+    setChatSending(true);
+
+    try {
+      const response = await fetch(`/api/match-sessions/${session.match_session_id}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          match_result_id: selectedMatchId,
+          messages: requestMessages,
+        }),
+      });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({})) as { detail?: string };
+        throw new Error(payload.detail ?? "The career assistant is unavailable right now");
+      }
+      const payload = (await response.json()) as MatchChatResponse;
+      setChatMessages((current) => ({
+        ...current,
+        [selectedMatchId]: [...(current[selectedMatchId] ?? []), payload.message],
+      }));
+    } catch (reason) {
+      setChatMessages((current) => ({ ...current, [selectedMatchId]: existing }));
+      setChatQuestion(question);
+      setChatError(
+        reason instanceof Error ? reason.message : "The career assistant is unavailable right now",
+      );
+    } finally {
+      setChatSending(false);
+    }
   }
 
   if (view === "jobs") {
@@ -572,6 +647,9 @@ export default function App() {
           (match) => match.match_result_id === selectedMatch.match_result_id,
         ) ?? -1
         : -1;
+      const selectedChatMessages = selectedMatch
+        ? chatMessages[selectedMatch.match_result_id] ?? []
+        : [];
       return (
         <main className="shell profile-shell">
           <section className="profile-card" aria-live="polite">
@@ -678,7 +756,11 @@ export default function App() {
                         aria-pressed={isSelected}
                         className={`match-summary-card ${isSelected ? "selected" : ""}`}
                         key={match.match_result_id}
-                        onClick={() => setSelectedMatchId(match.match_result_id)}
+                        onClick={() => {
+                          setSelectedMatchId(match.match_result_id);
+                          setChatQuestion("");
+                          setChatError(null);
+                        }}
                         type="button"
                       >
                         <span className="match-summary-top">
@@ -769,6 +851,84 @@ export default function App() {
                             )) : <p className="empty-state">All documented requirements are evidenced.</p>}
                           </section>
                         </div>
+
+                        <section className="match-chat" aria-labelledby="match-chat-title">
+                          <header className="match-chat-header">
+                            <div>
+                              <p className="selected-label">Career assistant</p>
+                              <h4 id="match-chat-title">Ask about this match</h4>
+                            </div>
+                            <span>Standardized context only</span>
+                          </header>
+                          <p className="match-chat-intro">
+                            Ask about your alignment, missing skills, or how to prepare for an
+                            interview. Answers use this selected job and your extracted profile.
+                          </p>
+
+                          {selectedChatMessages.length === 0 && (
+                            <div className="chat-suggestions" aria-label="Suggested questions">
+                              {[
+                                "What are my biggest gaps?",
+                                "How does my experience align?",
+                                "Help me prepare for an interview.",
+                              ].map((suggestion) => (
+                                <button
+                                  key={suggestion}
+                                  onClick={() => setChatQuestion(suggestion)}
+                                  type="button"
+                                >
+                                  {suggestion}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+
+                          {selectedChatMessages.length > 0 && (
+                            <div className="chat-transcript" aria-live="polite">
+                              {selectedChatMessages.map((message) => (
+                                <div className={`chat-message ${message.role}`} key={message.message_id}>
+                                  <span>{message.role === "user" ? "You" : "Job Matcher"}</span>
+                                  <p>{message.content}</p>
+                                </div>
+                              ))}
+                              {chatSending && (
+                                <div className="chat-message assistant pending">
+                                  <span>Job Matcher</span>
+                                  <p>Reviewing the standardized match…</p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          <form className="chat-form" onSubmit={(event) => void askAboutMatch(event)}>
+                            <label className="visually-hidden" htmlFor="match-chat-question">
+                              Ask a question about this job match
+                            </label>
+                            <textarea
+                              disabled={chatSending}
+                              id="match-chat-question"
+                              maxLength={1500}
+                              onChange={(event) => setChatQuestion(event.target.value)}
+                              onKeyDown={(event) => {
+                                if (event.key === "Enter" && !event.shiftKey) {
+                                  event.preventDefault();
+                                  event.currentTarget.form?.requestSubmit();
+                                }
+                              }}
+                              placeholder={`Ask about your match with ${selectedMatch.company}`}
+                              rows={2}
+                              value={chatQuestion}
+                            />
+                            <button disabled={chatSending || !chatQuestion.trim()} type="submit">
+                              {chatSending ? "Thinking…" : "Ask"}
+                            </button>
+                          </form>
+                          {chatError && <p className="chat-error" role="alert">{chatError}</p>}
+                          <p className="chat-privacy">
+                            This conversation is kept only in this browser tab and disappears with
+                            the temporary matching session.
+                          </p>
+                        </section>
                     </article>
                   );
                 })()}

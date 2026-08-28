@@ -4,14 +4,26 @@ from collections.abc import AsyncIterator
 from contextlib import suppress
 from pathlib import Path
 from typing import Annotated
-from uuid import UUID
+from uuid import UUID, uuid4
 
+import httpx
 import structlog
 from fastapi import APIRouter, File, HTTPException, Request, Response, UploadFile, status
 from fastapi.responses import StreamingResponse
 
 from app.document_reader import DocumentReadError, validate_upload_bytes
-from app.domain import CandidateProfile, MatchResults, SessionSummary
+from app.domain import (
+    CandidateProfile,
+    ChatMessage,
+    ChatRole,
+    MatchChatRequest,
+    MatchChatResponse,
+    MatchResults,
+    SessionStatus,
+    SessionSummary,
+)
+from app.gateway import LLMChatError
+from app.match_chat import build_match_chat_system_prompt
 from app.session_store import (
     SessionNotFoundError,
     SessionRetryUnavailableError,
@@ -96,6 +108,66 @@ def get_match_results(session_id: UUID, request: Request) -> MatchResults:
         )
     except SessionNotFoundError as exc:
         raise HTTPException(status_code=404, detail="Match session not found") from exc
+
+
+@router.post("/{session_id}/chat", response_model=MatchChatResponse)
+async def ask_about_match(
+    session_id: UUID,
+    payload: MatchChatRequest,
+    request: Request,
+) -> MatchChatResponse:
+    store = get_store(request)
+    try:
+        manifest = store.heartbeat(session_id)
+        if manifest.status != SessionStatus.READY:
+            raise HTTPException(status_code=409, detail="Match results are not ready")
+        if manifest.profile_filename is None or manifest.match_results_filename is None:
+            raise HTTPException(status_code=409, detail="Match results are not ready")
+        profile = CandidateProfile.model_validate_json(
+            store.read_artifact(session_id, manifest.profile_filename)
+        )
+        results = MatchResults.model_validate_json(
+            store.read_artifact(session_id, manifest.match_results_filename)
+        )
+    except SessionNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Match session not found") from exc
+
+    match = next(
+        (
+            item
+            for item in results.top_matches
+            if item.match_result_id == payload.match_result_id
+        ),
+        None,
+    )
+    if match is None:
+        raise HTTPException(status_code=404, detail="Selected match not found")
+
+    try:
+        answer = await request.app.state.chat_generator.generate(
+            system_prompt=build_match_chat_system_prompt(profile, match),
+            messages=payload.messages,
+        )
+    except (httpx.HTTPError, LLMChatError) as exc:
+        logger.warning(
+            "match_chat_generation_failed",
+            match_session_id=str(session_id),
+            match_result_id=str(payload.match_result_id),
+            error_type=type(exc).__name__,
+        )
+        raise HTTPException(
+            status_code=503,
+            detail="The career assistant is temporarily unavailable",
+        ) from exc
+
+    return MatchChatResponse(
+        match_result_id=match.match_result_id,
+        message=ChatMessage(
+            message_id=uuid4(),
+            role=ChatRole.ASSISTANT,
+            content=answer,
+        ),
+    )
 
 
 @router.post("/{session_id}/heartbeat", response_model=SessionSummary)

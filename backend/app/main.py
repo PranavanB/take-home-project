@@ -7,7 +7,8 @@ from fastapi import FastAPI
 
 from app.catalog import load_industry_catalog, load_job_dataset, load_skill_catalog
 from app.config import Settings, get_settings
-from app.gateway import OpenAIEmbeddingGateway, VLLMProfileDraftGenerator
+from app.gateway import OpenAIEmbeddingGateway, VLLMMatchChatGenerator, VLLMProfileDraftGenerator
+from app.match_chat import MatchChatGenerator
 from app.matcher import MatchAnalyzer
 from app.profile_extractor import ProfileDraftGenerator, ProfileExtractor
 from app.routes.jobs import router as jobs_router
@@ -30,9 +31,14 @@ async def cleanup_loop(store: SessionStore) -> None:
 def create_app(
     settings: Settings | None = None,
     profile_generator: ProfileDraftGenerator | None = None,
+    chat_generator: MatchChatGenerator | None = None,
 ) -> FastAPI:
     resolved = settings or get_settings()
     resolved_profile_generator = profile_generator or VLLMProfileDraftGenerator(
+        base_url=resolved.llm_base_url,
+        model=resolved.llm_model,
+    )
+    resolved_chat_generator = chat_generator or VLLMMatchChatGenerator(
         base_url=resolved.llm_base_url,
         model=resolved.llm_model,
     )
@@ -61,6 +67,7 @@ def create_app(
         app.state.jobs = load_job_dataset(resolved.job_dataset_root)
         app.state.skill_catalog = skill_catalog
         app.state.industry_catalog = industry_catalog
+        app.state.chat_generator = resolved_chat_generator
         document_worker = DocumentWorker(
             store=app.state.session_store,
             max_document_pages=resolved.max_document_pages,

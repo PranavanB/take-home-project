@@ -2,6 +2,7 @@ import time
 from io import BytesIO
 from pathlib import Path
 from typing import Any
+from uuid import UUID, uuid4
 
 from fastapi.testclient import TestClient
 from reportlab.pdfgen import canvas
@@ -21,6 +22,17 @@ class EmptyProfileGenerator:
     ) -> dict[str, Any]:
         category = next(iter(json_schema["properties"]))
         return {category: None if category in {"country", "industry"} else []}
+
+
+class RecordingChatGenerator:
+    def __init__(self) -> None:
+        self.system_prompt = ""
+        self.messages = []
+
+    async def generate(self, *, system_prompt: str, messages: list[Any]) -> str:
+        self.system_prompt = system_prompt
+        self.messages = messages
+        return "The standardized comparison shows which requirements are met and missing."
 
 
 def make_pdf_bytes(text: str) -> bytes:
@@ -193,6 +205,112 @@ def test_complete_pipeline_returns_exactly_three_results(tmp_path) -> None:
         assert results.status_code == 200
         assert len(results.json()["top_matches"]) == 3
         assert all(len(match["requirements"]) >= 7 for match in results.json()["top_matches"])
+
+
+def test_ready_session_can_chat_about_one_selected_standardized_match(tmp_path) -> None:
+    dataset_root = Path(__file__).resolve().parents[2] / "seed" / "jobs"
+    settings = Settings(
+        session_root=tmp_path / "sessions",
+        job_dataset_root=dataset_root,
+        worker_poll_seconds=0.01,
+    )
+    chat_generator = RecordingChatGenerator()
+
+    with TestClient(
+        create_app(settings, EmptyProfileGenerator(), chat_generator)
+    ) as client:
+        created = client.post(
+            "/api/match-sessions",
+            files={
+                "resume": (
+                    "resume.pdf",
+                    make_pdf_bytes("Alex Morgan - Senior Software Engineer"),
+                    "application/pdf",
+                )
+            },
+        )
+        session_id = created.json()["match_session_id"]
+        deadline = time.monotonic() + 3
+        summary = created.json()
+        while summary["stage"] not in {"ready", "failed"}:
+            assert time.monotonic() < deadline
+            time.sleep(0.01)
+            summary = client.get(f"/api/match-sessions/{session_id}").json()
+        assert summary["stage"] == "ready"
+
+        results = client.get(f"/api/match-sessions/{session_id}/results").json()
+        selected = results["top_matches"][0]
+        session_files_before = {
+            item.name for item in (settings.session_root / session_id).iterdir()
+        }
+        user_message_id = uuid4()
+        response = client.post(
+            f"/api/match-sessions/{session_id}/chat",
+            json={
+                "match_result_id": selected["match_result_id"],
+                "messages": [
+                    {
+                        "message_id": str(user_message_id),
+                        "role": "user",
+                        "content": "Which required skills are missing?",
+                    }
+                ],
+            },
+        )
+
+        assert response.status_code == 200
+        payload = response.json()
+        assert payload["match_result_id"] == selected["match_result_id"]
+        assert payload["message"]["role"] == "assistant"
+        UUID(payload["message"]["message_id"])
+        assert "standardized comparison" in payload["message"]["content"]
+        assert chat_generator.messages[0].message_id == user_message_id
+        assert "CANDIDATE_STANDARDIZED_CONTEXT" in chat_generator.system_prompt
+        assert "SELECTED_JOB_STANDARDIZED_CONTEXT" in chat_generator.system_prompt
+        assert selected["match_result_id"] in chat_generator.system_prompt
+        assert '"standard_key"' in chat_generator.system_prompt
+        assert "Alex Morgan" not in chat_generator.system_prompt
+        assert {
+            item.name for item in (settings.session_root / session_id).iterdir()
+        } == session_files_before
+
+        missing_match = client.post(
+            f"/api/match-sessions/{session_id}/chat",
+            json={
+                "match_result_id": str(uuid4()),
+                "messages": [
+                    {
+                        "message_id": str(uuid4()),
+                        "role": "user",
+                        "content": "Tell me about this role",
+                    }
+                ],
+            },
+        )
+        assert missing_match.status_code == 404
+        assert missing_match.json()["detail"] == "Selected match not found"
+
+
+def test_chat_rejects_non_alternating_or_assistant_final_messages(tmp_path) -> None:
+    dataset_root = Path(__file__).resolve().parents[2] / "seed" / "jobs"
+    settings = Settings(session_root=tmp_path / "sessions", job_dataset_root=dataset_root)
+
+    with TestClient(create_app(settings, EmptyProfileGenerator())) as client:
+        response = client.post(
+            f"/api/match-sessions/{uuid4()}/chat",
+            json={
+                "match_result_id": str(uuid4()),
+                "messages": [
+                    {
+                        "message_id": str(uuid4()),
+                        "role": "assistant",
+                        "content": "Not a user question",
+                    }
+                ],
+            },
+        )
+
+    assert response.status_code == 422
 
 
 def test_failed_matching_session_can_retry_from_saved_profile(tmp_path) -> None:

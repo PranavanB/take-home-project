@@ -5,6 +5,8 @@ sees a read-only standardized profile, and receives three matches from a bundled
 dataset: six synthetic POC roles and ten roles researched from current employer listings.
 The researched set is deliberately mixed: five technology roles and five roles from
 healthcare, retail, hospitality, facilities services, and aviation.
+After selecting a match, the user can ask a temporary career assistant about alignment,
+gaps, or interview preparation using the standardized candidate and job facts.
 
 ## How matching works
 
@@ -46,6 +48,9 @@ display fields and never affect the match or its tie-breaks.
   job titles do not influence the result.
 - **Explainable results:** every match shows category percentages, Met/Missing requirements,
   supporting CV evidence, documented gaps, and truthful actions that could improve alignment.
+- **Selected-match career chat:** the local LLM answers follow-up questions from a guarded
+  system prompt containing the standardized profile and one selected match. Chat cannot
+  change the deterministic score and is never written to the server-side session.
 - **Recoverable temporary sessions:** UUID-backed processing checkpoints survive service
   restarts, retry transient failures, and delete the complete session after reset or expiry.
 - **Tested responsive interface:** a React frontend supports the complete focused journey,

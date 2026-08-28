@@ -7,7 +7,8 @@ Job Matcher helps a user understand which available jobs best match their CV.
 The user uploads one PDF or DOCX CV. The application extracts a structured profile,
 standardizes the relevant information, compares it with the available jobs, and returns
 the three strongest matches. Each result explains what matched, what is missing, and what
-the user could do to close the documented gaps.
+the user could do to close the documented gaps. The user can then ask questions about one
+selected match using the same standardized candidate and job facts.
 
 The application should remain simple, understandable, and trustworthy. AI is used to
 interpret document language, while deterministic application code makes the final matching
@@ -176,6 +177,24 @@ forcing the user to upload the CV again after a model or container restart.
 **Compromise:** Users cannot return later to view earlier matches. A full product would use
 authenticated profiles, explicit retention controls, and secure long-term storage. It would
 retain the original CV so improved extraction and matching systems could reprocess it.
+
+### 11. Add questions without allowing AI to change the match
+
+**Decision:** Each result includes a small career-assistant chat. The backend builds the
+system prompt from the standardized candidate profile and one selected job match. It sends
+only the recent conversation with each question. The model explains the recorded match,
+skill gaps, experience alignment, and interview preparation, but it cannot write to the
+profile or alter the deterministic score.
+
+**Why:** Structured results answer the expected questions, while a conversation lets users
+explore the parts that matter to them without requiring a new workflow. Supplying the
+already-standardized facts also keeps the prompt smaller and avoids asking the model to read
+or reinterpret the original CV for every question.
+
+**Compromise:** Answers are generated and can still be incomplete, so the system prompt
+requires the model to identify missing information and avoid inventing evidence. Chat works
+only for the selected top-three result, remains in browser memory, and disappears with the
+temporary session.
 
 ## Deferred work
 

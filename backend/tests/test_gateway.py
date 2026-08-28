@@ -1,11 +1,15 @@
 import json
+from uuid import uuid4
 
 import httpx
 import pytest
 
+from app.domain import ChatMessage, ChatRole
 from app.gateway import (
+    LLMChatError,
     LLMGatewayError,
     OpenAIEmbeddingGateway,
+    VLLMMatchChatGenerator,
     VLLMProfileDraftGenerator,
 )
 
@@ -67,6 +71,67 @@ async def test_vllm_generator_rejects_invalid_json_without_exposing_content() ->
         await generator.generate(system_prompt="system", user_prompt="user", json_schema={})
 
     assert "secret CV text" not in str(caught.value)
+
+
+@pytest.mark.asyncio
+async def test_match_chat_sends_system_context_and_alternating_history() -> None:
+    captured: dict[str, object] = {}
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        captured.update(json.loads(request.content))
+        return httpx.Response(
+            200,
+            json={"choices": [{"message": {"content": "  Focus on the stated gaps.  "}}]},
+        )
+
+    generator = VLLMMatchChatGenerator(
+        base_url="http://vllm:8000/v1/",
+        model="job-matcher-llm",
+        transport=httpx.MockTransport(handler),
+    )
+    messages = [
+        ChatMessage(message_id=uuid4(), role=ChatRole.USER, content="What is missing?"),
+        ChatMessage(message_id=uuid4(), role=ChatRole.ASSISTANT, content="Docker."),
+        ChatMessage(message_id=uuid4(), role=ChatRole.USER, content="How can I prepare?"),
+    ]
+
+    answer = await generator.generate(
+        system_prompt="trusted standardized context",
+        messages=messages,
+    )
+
+    assert answer == "Focus on the stated gaps."
+    assert captured["model"] == "job-matcher-llm"
+    assert captured["temperature"] == 0.2
+    assert captured["max_tokens"] == 1024
+    assert captured["chat_template_kwargs"] == {"enable_thinking": False}
+    assert captured["messages"] == [
+        {"role": "system", "content": "trusted standardized context"},
+        {"role": "user", "content": "What is missing?"},
+        {"role": "assistant", "content": "Docker."},
+        {"role": "user", "content": "How can I prepare?"},
+    ]
+    assert "response_format" not in captured
+
+
+@pytest.mark.asyncio
+async def test_match_chat_rejects_empty_model_answer_without_exposing_payload() -> None:
+    async def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"choices": [{"message": {"content": "  "}}]})
+
+    generator = VLLMMatchChatGenerator(
+        base_url="http://vllm:8000/v1",
+        model="job-matcher-llm",
+        transport=httpx.MockTransport(handler),
+    )
+
+    with pytest.raises(LLMChatError):
+        await generator.generate(
+            system_prompt="system",
+            messages=[
+                ChatMessage(message_id=uuid4(), role=ChatRole.USER, content="Question")
+            ],
+        )
 
 
 @pytest.mark.asyncio

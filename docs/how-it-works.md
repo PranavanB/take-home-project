@@ -22,6 +22,8 @@ Compare with standardized jobs
 Rank all jobs
    ↓
 Display the top three matches
+   ↓
+Ask questions about one match
 ```
 
 ## 1. Start a session
@@ -169,7 +171,27 @@ experience, education, or credential.
 A complete result means the standardized facts covered the recorded requirements. It is not
 a guarantee of an interview, offer, or suitability decision.
 
-## 8. Recover work and remove temporary data
+## 8. Ask questions about a selected match
+
+Each selected result includes a small career-assistant chat. When the user asks a question,
+the browser sends the recent conversation and the selected match ID. The server verifies
+that the match belongs to the current session, then builds a fresh system prompt containing:
+
+- Standardized CV skills, education level, dated experience, country, and industry
+- Extracted experience, education, and qualifications needed to explain the profile
+- The selected job's standardized requirement keys and Met or Missing outcomes
+- Category coverage, supporting evidence labels, and documented gap actions
+
+The original CV text is not sent again. Strings from CV and job fields are treated as
+untrusted data rather than instructions. The model must use only the supplied context, say
+when information is missing, avoid inventing experience or credentials, and leave the
+deterministic score unchanged.
+
+The server returns one answer with a new UUID. It does not save questions or answers. The
+browser keeps a separate conversation for each selected result in memory, limited to the
+most recent exchanges sent with a new question.
+
+## 9. Recover work and remove temporary data
 
 While processing, the interface shows three stages:
 
@@ -186,7 +208,7 @@ lost, the heartbeat stops and the server removes the session after ten minutes o
 Deleted sessions cannot be recovered. The current application has no user accounts or saved
 match history.
 
-## 9. Future improvements
+## 10. Future improvements
 
 Before using the matcher beyond this proof of concept, the following improvements should be
 made:
