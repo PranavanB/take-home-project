@@ -28,23 +28,28 @@ display fields and never affect the match or its tie-breaks.
 
 ## Current features
 
-- UUID-backed temporary sessions with crash recovery and bounded retries
-- PDF/DOCX validation and source-aware text extraction
-- Raw CV deletion immediately after successful reading
-- Grounded, schema-constrained profile extraction through a separate vLLM container
-- Skill extraction from all parts of the CV, followed by Arctic Embed 2.0 vector mapping
-- Conservative vector acceptance: ambiguous or weak mappings remain visibly unmapped
-- Deterministic exact mapping for explicitly labelled CV industries
-- 56 stable standardized skill concepts, 20 NAICS sectors, and 16 persisted, versioned
-  normalized jobs
-- Searchable available-jobs catalogue backed by the same 16-job matching dataset
-- Source links and research dates for the ten employer-sourced listings
-- A mixed-sector catalogue rather than a technology-only vacancy list
-- Multi-sentence job descriptions and human-readable city or regional locations
-- Exact education, skill, experience-duration, country, and industry matching
-- Deterministic weighted top three with per-category percentages, evidence, and gap actions
-- Heartbeat expiry and explicit whole-session deletion
-- Test-first backend coverage and a responsive React interface
+- **Safe CV intake:** accepts validated PDF and DOCX files, preserves source locations for
+  evidence, and deletes the raw upload as soon as text extraction succeeds.
+- **Grounded profile extraction:** a schema-constrained local vLLM extracts the candidate's
+  experience, skills, education, qualifications, country, and industry without inventing
+  unsupported facts.
+- **Standardized candidate data:** education maps to EQF levels, locations to ISO country
+  codes, industries to NAICS sectors, and dated roles to non-overlapping experience months.
+- **Reviewed skill mapping:** exact aliases and Arctic Embed 2.0 map CV wording to a
+  versioned 56-concept ESCO/O*NET-backed catalogue; weak or ambiguous phrases remain
+  visibly unmapped and cannot affect scoring.
+- **Auditable job catalogue:** all 16 jobs have persisted, versioned requirements. The
+  searchable mixed-sector jobs page includes dated source links for the ten
+  employer-researched roles.
+- **Deterministic matching:** an in-memory SQLite join compares five standardized categories
+  and ranks the top three using explicit category weights. The LLM does not judge fit, and
+  job titles do not influence the result.
+- **Explainable results:** every match shows category percentages, Met/Missing requirements,
+  supporting CV evidence, documented gaps, and truthful actions that could improve alignment.
+- **Recoverable temporary sessions:** UUID-backed processing checkpoints survive service
+  restarts, retry transient failures, and delete the complete session after reset or expiry.
+- **Tested responsive interface:** a React frontend supports the complete focused journey,
+  backed by 43 deterministic backend tests, lint checks, and a production build check.
 
 This product includes information from the O*NET 30.3 Database by the U.S. Department
 of Labor, Employment and Training Administration (USDOL/ETA), used under the
@@ -55,11 +60,6 @@ endorsed, or tested those changes.
 ## Documentation
 
 - [How Job Matcher works](docs/how-it-works.md) explains every process in plain English.
-- [Build progress and rationale](docs/build-progress.md) records what is implemented,
-  why, verification, and deferred work.
-- [Decision log](docs/decision-log.md) separates confirmed product reasons, engineering
-  rationale, and decisions whose motivation still needs confirmation.
-- [Model smoke-test record](docs/model-smoke.md) records local model and hardware checks.
 - [Implementation plan](plan.md) contains the broader build decisions and scope.
 
 ## Run with Docker

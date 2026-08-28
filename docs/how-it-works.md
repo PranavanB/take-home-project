@@ -1,389 +1,211 @@
 # How Job Matcher Works
 
-This guide explains the proof of concept in plain English: what each process does and
-why it was chosen.
+This document follows one CV through Job Matcher from upload to results. It describes what
+the application does at runtime without repeating project decisions, implementation status,
+or model test results.
 
-## The short version
+For the reasons behind the design and its accepted compromises, see [`plan.md`](../plan.md).
 
-1. The user can search and review the 16 available jobs or upload a PDF or DOCX CV.
-2. Job Matcher reads the document and uses the local language model to extract facts.
-3. The skill pass reads the whole CV, including employment history and responsibilities.
-4. Exact aliases and Snowflake Arctic Embed 2.0 map CV phrases to the same catalogue used
-   by the jobs' persisted, versioned requirements.
-5. Those facts are reduced to five matching categories: education level, standardized
-   skills, dated experience, country, and industry.
-6. A temporary database compares identical keys and returns the top three jobs.
-7. The results show exact matches, missing items, and truthful next actions.
-8. The temporary session is deleted when the user resets it or its heartbeat expires.
+## Process overview
 
-The models extract and standardize evidence. They do not decide whether a job fits.
+```text
+Upload CV
+   ↓
+Read document
+   ↓
+Extract evidence-backed profile
+   ↓
+Standardize candidate facts
+   ↓
+Compare with standardized jobs
+   ↓
+Rank all jobs
+   ↓
+Display the top three matches
+```
 
-## 1. Landing page, available jobs, and temporary session
+## 1. Start a session
 
-The welcome page has two actions: **Upload your resume** and **View available jobs**.
-The jobs action opens a conventional, searchable catalogue containing all 16 roles used
-by the matcher: six synthetic POC roles and ten roles researched from live employer job
-pages. Each listing shows the job title, employer, location, description, work pattern,
-salary where it was published, industry, responsibilities, and required and preferred
-experience. A back action returns to the upload page, and the `/jobs` address can be
-opened or refreshed directly.
+The welcome page lets the user upload a CV or view the available jobs. The jobs page is
+read-only and uses the same bundled job records as the matcher.
 
-Descriptions are substantial, plain-English overviews rather than one-line taglines. The
-six synthetic POC roles use varied display locations in Manchester, Bristol, Cambridge,
-Edinburgh, Birmingham, and Leeds. Employer-sourced locations remain faithful to their
-linked adverts. These detailed locations help users understand the listing, but the POC
-matcher still compares location only at country level (`GB`).
+The upload route accepts text-based PDF and DOCX files up to 10 MB. It checks the actual file
+type and rejects empty, damaged, encrypted, oversized, or unsupported documents before
+processing begins.
 
-The ten employer-sourced records contain a link to the original listing and the date it
-was checked. Their descriptions and requirements are concise paraphrases rather than
-copies of the adverts. Employer vacancies can close or change after that date, so Job
-Matcher presents them as a dated POC dataset rather than promising live availability.
-
-The sourced half of the catalogue is intentionally balanced between five technology roles
-and five non-technology roles: registered nursing, retail operations, professional
-cooking, facilities cleaning, and cabin crew. Why: education, skills, experience, location,
-and industry matching should be demonstrated across different kinds of work, not mistaken
-for a technology-only matcher.
-
-The catalogue comes from a public read-only API backed by the same bundled job files used
-for matching. It deliberately omits internal standardized skill UUIDs. Why: candidates can
-understand the current opportunity set before sharing a CV, and using one data source keeps
-the visible listing aligned with the actual matcher.
-
-The upload action accepts text-based PDF and DOCX files up to 10 MB. It checks the real
-file type and rejects empty, damaged, encrypted, oversized, or unsupported documents.
-
-Every upload receives random UUIDs for the session, CV, and processing job. Temporary
-artifacts live under the session UUID, so the whole visit can be deleted as one unit.
-
-Why: two clearly separated actions keep the product focused while letting someone inspect
-the dataset before starting a match. File checks prevent wasted model work, and UUID-scoped
-storage makes cleanup and crash recovery predictable. UUIDs are appropriate for public or
-independently created identities, although they are not a substitute for authorization and
-are not automatically better than integers in every system.
+An accepted upload creates unique IDs for the session, CV, and processing job. All temporary
+artifacts for that visit are kept together under the session ID.
 
 ## 2. Read the CV
 
-A normal document parser extracts text first. PDF pages and ordered DOCX paragraphs or
-tables retain source IDs. Scanned-image PDFs are not supported yet; OCR is a future
-update.
+A document parser extracts the text. PDF text remains associated with its page, while DOCX
+paragraphs and tables retain their original order. These source locations allow later facts
+to be traced back to the CV.
 
-Why: document parsers are faster and more reliable at recovering text than asking a
-language model to read file formats. Source IDs also let every later claim point back to
-the CV.
+The uploaded file is deleted after text extraction succeeds. The extracted text remains in
+the temporary session until the remaining stages finish.
 
-The uploaded PDF or DOCX is deleted as soon as text extraction succeeds. The extracted
-text remains only inside the active temporary session because later stages need it.
+Scanned or image-only PDFs are not processed because the application does not currently
+include optical character recognition.
 
-## 3. Extract grounded CV facts
+## 3. Build an evidence-backed profile
 
-The local model runs in its own vLLM Docker service. This allows inference to scale
-separately from the application and makes a later hardware-vendor migration easier at the
-service boundary. Such a migration would still require a vendor-specific image, runtime,
-and compatible model format; the current NVFP4 deployment is tied to the current NVIDIA
-configuration.
+The extracted text is sent to the language-model service in several small, structured
+requests. It extracts:
 
-The service receives the extracted text and returns six small structured responses:
+- Employment experience
+- Skills
+- Qualifications and professional credentials
+- Education
+- Current country, when explicitly stated
+- Current industry, when explicitly stated
 
-- experience;
-- skills;
-- qualifications;
-- education;
-- current country, when explicitly stated; and
-- current industry, when explicitly stated.
+The application places the current or most recent position first. The skill extraction step
+reads the complete CV, including employment history and responsibilities. Degrees are placed
+under Education; certifications, licences, and other formal non-degree awards are placed
+under Qualifications.
 
-Degrees go under Education. Certifications, licences, and other formal non-degree awards
-go under Qualifications. The current or latest position is placed first. The skills pass
-reviews employment history and responsibilities, not only a section explicitly named Skills.
+Every proposed fact must refer to supporting text. The application checks that evidence
+against the extracted document, stores an exact source excerpt, and removes unsupported
+facts. Information that is not stated remains missing.
 
-The application checks every proposed item against the source document and replaces the
-model's evidence wording with an exact excerpt. Unsupported items are dropped. Missing
-facts stay missing.
+The resulting profile is read-only and is carried into the matching stage automatically.
 
-Why: the model is useful for understanding varied CV language, but application code must
-control the schema, evidence, dates, identities, and safety rules.
+## 4. Standardize the matching facts
 
-## 4. Reduce the CV to five standard categories
+The profile is reduced to five categories that also exist on every prepared job record.
 
-The matching profile contains only these categories:
+### Education
 
-### Education level
-
-Degree wording is converted to one ordered level:
-
-| Standard level | EQF level |
-|---|---:|
-| Secondary education | 4 |
-| Vocational qualification | 5 |
-| Bachelor's degree | 6 |
-| Master's degree | 7 |
-| Doctorate | 8 |
-
-The levels follow the European Qualifications Framework. A higher level satisfies a
-lower minimum: for example, a Master's degree meets a Bachelor's requirement.
+Recognized education is converted to an ordered internal level aligned with the European
+Qualifications Framework. During comparison, a higher recorded level can satisfy a lower
+minimum requirement.
 
 ### Skills
 
-The local language model first extracts the skill phrases exactly supported by the CV.
-Each phrase then follows two mapping steps:
+Each extracted skill phrase is checked against the reviewed skills catalogue.
 
-1. An exact, case-insensitive alias lookup is tried first. Exact matches are accepted with
-   no vector inference.
-2. Otherwise, Snowflake Arctic Embed 2.0 compares the phrase with descriptions of the
-   reviewed catalogue concepts. The phrase is encoded as a query and the catalogue items
-   as documents, following the model's retrieval instructions.
+1. Known names and aliases are matched directly.
+2. An embedding service compares the meaning of any unresolved phrase with catalogue
+   descriptions.
+3. A semantic mapping is accepted only when it passes the configured confidence and
+   ambiguity checks.
 
-A vector result is accepted only when its cosine similarity clears the configured cutoff
-and it is sufficiently ahead of the runner-up concept. Weak or ambiguous phrases remain
-unmapped and cannot affect the score. The UI keeps these phrases visible so the user can
-see what was extracted without pretending they matched a standard. A displayed similarity
-is a model comparison value, not a probability that the person has the skill.
+Accepted skills use stable catalogue IDs. This allows different phrases in a CV and job
+advert to resolve to the same skill. Weak or ambiguous phrases remain visible as unmapped
+skills and cannot affect the result.
 
-Accepted facts use catalogue UUIDs, not free text. The same mapper is used for CV and job
-phrases, so different wording can converge on one identity before matching begins. This
-also scales more economically: the large LLM creates compact structured facts once, then
-the smaller embedding model performs the repeated catalogue comparisons.
-
-The catalogue uses official ESCO concepts where ESCO has a suitable entry and a reviewed
-subset of official O*NET 30.3 transferable skills for the U.S. skills standard. Modern product
-names that are not suitable ESCO concepts, such as Docker, React, or Terraform, are
-clearly labelled Job Matcher extensions with their own stable UUIDs. They are not
-misrepresented as official ESCO concepts.
-
-The POC catalogue contains 56 concepts and is deliberately versioned. It can later be
-replaced by larger ESCO and O*NET imports without changing the matching contract. The
-current scope deliberately covers European and North American terminology rather than a
-worldwide taxonomy. The selected embedding model is
-`Snowflake/snowflake-arctic-embed-m-v2.0`, served in its own CPU container so the main
-generation model retains the GPU.
-
-The 56-concept list is deliberately sufficient for this fixed POC dataset, not a complete
-cross-sector labour-market taxonomy. Expanding and evaluating broader non-technology coverage
-is out of scope for the POC.
+The catalogue uses reviewed ESCO and O*NET concepts plus clearly labelled local concepts
+where a suitable standard entry is unavailable.
 
 ### Experience
 
-Dated employment periods are converted to calendar-month intervals. Overlapping jobs are
-merged so the same month is counted once, and the resulting total is recorded with an as-of
-date. Jobs with an explicit minimum use an exact `experience-months:<minimum>` requirement.
-The POC does not invent a duration when an advert gives none.
+Employment dates are converted to calendar-month intervals. Overlapping roles are merged so
+the same month is counted once. The total can then be compared with a job's numeric minimum
+when one is stated.
 
-This total-duration check sits alongside relevant skill requirements. It does not claim that
-all employment months were spent using every skill. Production should associate duration
-with specific roles, skills, and industries before enforcing a domain-specific statement such
-as “three years of acute nursing experience.”
+The current matcher treats total experience and relevant skills as separate facts. It does
+not claim that every skill was used throughout the candidate's entire work history.
 
 ### Location
 
-Location is one ISO two-letter country code, such as `GB`. City, distance, remote-work
-rules, visas, and relocation are outside the POC. Country-only matching is an accepted POC
-simplification, not the intended production location model.
+Location is reduced to an ISO country code. Detailed city, distance, remote-work, visa, and
+relocation rules are not part of the comparison.
 
 ### Industry
 
-Industry is mapped to one of the 20 top-level sectors in the 2022 North American Industry
-Classification System (NAICS). The system uses the current or most recent employer's
-explicitly stated industry. It does not guess an industry from a company name.
+An explicitly stated industry is mapped to a broad NAICS sector with a stable ID. The
+application does not infer an industry from an employer name.
 
-When a CV contains an `Industry:`, `Sector:`, or `Business domain:` label, application
-code reads the complete labelled value and accepts it only when it exactly matches a
-reviewed NAICS alias. This deterministic check runs even if the language model omits the
-field. It was chosen because an explicit label is already structured data and should not
-depend on variable model behaviour.
+## 5. Load the standardized jobs
 
-The stored fact contains both the NAICS sector code and a stable UUID. The broad sector
-level keeps the POC understandable; detailed three- to six-digit industries can be added
-later if the product needs them. This coarse sector comparison is accepted for the POC;
-production should use the level of detail the vacancy and candidate data can support.
+The bundled jobs have already passed through the same standardization rules. Their saved
+records contain required and preferred facts, together with the catalogue versions used to
+create them.
 
-Why: the same stable values can be stored on both CVs and jobs. This removes fuzzy wording
-from the actual match and makes every result reproducible.
+The matcher reads these prepared records directly. It does not ask the language model to
+reinterpret every job when a CV is uploaded or when the API restarts. Job titles remain
+display information and are not used as matching evidence.
 
-References: [Snowflake Arctic Embed 2.0](https://huggingface.co/Snowflake/snowflake-arctic-embed-m-v2.0),
-[ESCO](https://esco.ec.europa.eu/en/about-esco/what-esco),
-[O*NET 30.3](https://www.onetcenter.org/database.html),
-[2022 NAICS](https://www.census.gov/programs-surveys/economic-census/year/2022/guidance/understanding-naics.html),
-and [the eight EQF levels](https://europass.europa.eu/en/description-eight-eqf-levels).
+## 6. Compare and rank
 
-## 5. Standardize the 16 jobs
+The application creates a temporary in-memory SQLite database for the match. Candidate facts
+and job requirements are inserted using their standard keys.
 
-Every bundled job fixture contains:
+Each job requirement receives one result:
 
-- a minimum education level when the source states one;
-- required standardized skill UUIDs;
-- one ISO country code;
-- one NAICS industry sector; and
-- preferred standardized skill UUIDs where relevant.
+- **Met** when the candidate has the same standard fact or meets an ordered threshold.
+- **Missing** when no matching fact is present.
 
-The 16 POC job files already contain their reviewed standardized requirements. Each file
-stores a `job-requirements-v1` version and the exact skill- and industry-catalogue versions
-used to create it. Matching reads those saved records directly; it does not ask the LLM to
-reinterpret every job for every uploaded CV or after an API restart.
+Free-text phrases do not enter this comparison. Skill IDs must be identical, education must
+meet the ordered minimum, dated experience must meet the required number of months, and
+country and industry IDs must match.
 
-The preparation route extracts required and preferred skill phrases from the advert's
-summary, responsibilities, and qualification lists, then uses the same exact-alias and
-Arctic mapper as the CV. The title is deliberately excluded because job titles are display
-labels that employers can invent. Three adverts state a numeric minimum, so their persisted
-records also hold 6, 12, or 24 months of required experience. No duration is invented for
-the other jobs.
+Each category is scored separately before the configured category weights are applied. If a
+job does not contain a requirement for a category, that category is excluded and the
+remaining weights are adjusted proportionally.
 
-The job files and catalogues are read-only application data; they are not copied into a
-permanent user database.
+Required coverage determines the main ranking. Preferred coverage is considered next, and a
+stable internal ID resolves an otherwise exact tie. All available jobs are ranked and the
+highest three are returned.
 
-Why: a fixed 16-job dataset is enough to demonstrate a meaningful top-three choice and a
-recognizable jobs page without building job administration, accounts, automated vacancy
-feeds, or a large search platform. Keeping source metadata makes the ten researched roles
-auditable even when an employer later changes or removes a listing.
+## 7. Display the results
 
-### Future full-build job ingestion
+The results page shows the extracted profile and three compact job cards. The first match is
+selected automatically. Selecting another card updates the detailed panel below it.
 
-The full product will replace manually prepared fixtures with a dedicated vacancy-ingestion
-process. It will accept a job advert or trusted employer feed, retain the original source,
-and break the vacancy into structured component parts:
+For the selected job, the page shows:
 
-- original and standardized job title for search and display, never as fit evidence;
-- employer and source identity;
-- country, city or region, and remote or hybrid rules;
-- required and preferred skills;
-- minimum education and formal qualifications;
-- industry;
-- responsibilities and numeric experience requirements;
-- employment type, work pattern, salary, and closing date where stated; and
-- source URL, source evidence, and the time the advert was checked.
+- Coverage for each matching category
+- Met and Missing requirements
+- Supporting excerpts from the CV
+- Required and preferred totals
+- Actions related to the documented gaps
 
-The language model will extract only information supported by the source advert. Application
-code will then convert country to ISO codes, education to the agreed EQF levels, industry to
-NAICS UUIDs, and skill phrases to the reviewed ESCO/O*NET-backed skill UUIDs using exact
-aliases and Arctic vector mapping. Both the original title and a standardized title will be
-kept; the production title taxonomy still needs to be selected and reviewed.
+Actions do not tell the user to claim experience they do not have. They can recommend adding
+clearer CV evidence when the user genuinely has a missing skill or gaining the missing
+experience, education, or credential.
 
-Before publication, the pipeline will validate required fields, flag weak or ambiguous
-mappings for review, detect duplicate or updated adverts, and save the normalized job with
-its provenance, requirements version, and catalogue versions. Why: the exact database matcher
-can scale only when every vacancy reaches it as the same predictable structure. Retaining the
-original source also allows jobs to be reprocessed when extraction rules or taxonomies improve.
+A complete result means the standardized facts covered the recorded requirements. It is not
+a guarantee of an interview, offer, or suitability decision.
 
-## 6. Exact database matching
+## 8. Recover work and remove temporary data
 
-For each match, Job Matcher creates a SQLite database in memory. It inserts the job
-requirements and the candidate facts, then joins rows on an identical standard key:
-
-- `skill:<UUID>` for skills;
-- `education:<level>` for education; and
-- `experience-months:<minimum>` for total dated experience;
-- `country:<ISO code>` for location; and
-- `industry:<UUID>` for the NAICS sector.
-
-For ordered education, the candidate contributes every minimum level they satisfy. A
-Master's candidate therefore contributes exact facts for Master's, Bachelor's,
-vocational, and secondary levels. The database join itself remains a simple exact match.
-
-The candidate's total experience is calculated from role start/end dates. Overlapping roles
-are merged so the same calendar month is not counted twice; current roles run to the recorded
-as-of month. When only a year is stated, January is used for a start and December for an end,
-so the UI labels this as a calculation from dated roles rather than an exact legal record.
-The skill pass reads employment history and responsibilities, not just a Skills section.
-For this POC, total duration and relevant skill UUIDs are separate requirements. Production
-should link durations to individual roles and skills.
-
-Free-text skills never enter this join. If a CV or job phrase cannot be mapped to a
-catalogue UUID, it cannot create a fuzzy or partial match.
-
-Why: exact database joins are simple, fast, testable, and explainable. The same inputs
-always produce the same results, and the language model cannot inflate a score.
-
-## 7. Results and ranking
-
-Every requirement is either:
-
-- **Met** — an identical standardized database fact exists; or
-- **Missing** — it does not.
-
-There is no Partial state in this version. Each job shows numeric percentages and
-Met/Missing counts for Education, Skills, Experience, Location, and Industry. It also shows
-required and preferred totals.
-
-Jobs are ordered by:
-
-1. weighted required-category coverage;
-2. weighted preferred-category coverage; and
-3. UUID as the stable tie-breaker.
-
-The explicit POC category weights are Skills 40%, Experience 25%, Education 15%, Location
-10%, and Industry 10%. Each category is converted to its own coverage proportion first, so
-a job with more skill rows does not silently give Skills extra weight. Categories absent from
-a job are excluded and the applicable weights are normalized. Exactly three jobs are
-returned. Job titles do not affect evidence, scores, or ties because titles are inconsistent
-and can be invented. A later review will validate these category weights, decide numerical
-required/preferred weights, and define whether an overall fit percentage is useful.
-
-Missing items include an honest action such as adding truthful CV evidence if the person
-really has that skill. Complete coverage means only that every standardized database
-requirement matched; it never guarantees an interview, offer, or real-world suitability.
-
-The results page first presents the top three jobs as compact comparison cards. The first
-job is selected automatically, and choosing another card replaces the single detailed
-panel below it. This keeps required and preferred counts easy to compare without rendering
-three long reports at once. The selected panel then shows category coverage, CV evidence,
-gaps, and suggested next steps. The layout stacks into one column on narrow screens.
-
-Why: counts expose precisely what happened. They are more useful and defensible than an
-opaque AI fit score.
-
-## 8. Progress, recovery, and deletion
-
-The page shows three stages:
+While processing, the interface shows three stages:
 
 `Reading your CV → Building your profile → Finding your matches`
 
-Each finished stage is saved atomically. If the API restarts, the worker validates the
-newest saved artifact and continues from the next incomplete stage. A temporary failure
-is retried up to three times, and the failure page can resume from saved session work.
+The backend saves each completed stage atomically. If processing is interrupted, it checks
+the saved artifacts and resumes from the next incomplete stage while the session remains
+active. Temporary failures can be retried without repeating valid completed work.
 
-The browser sends a heartbeat while the experience is open. Explicitly choosing another
-CV deletes the session immediately. Closing the page stops heartbeats; after ten minutes
-without one, cleanup removes the entire session. This expiry path also covers browser
-crashes and lost connections.
+The browser sends a heartbeat while the experience is open. Starting again deletes the
+current session immediately. If the page closes, the browser crashes, or the connection is
+lost, the heartbeat stops and the server removes the session after ten minutes of inactivity.
 
-Why: browsers cannot reliably promise a final “I am leaving” message. A short lease gives
-the POC dependable deletion without allowing a transient page event to destroy active
-processing.
+Deleted sessions cannot be recovered. The current application has no user accounts or saved
+match history.
 
-## 9. What a real product would retain
+## 9. Future improvements
 
-This POC has no accounts and deletes everything session-specific. A real system would tie
-data to an authenticated user profile and retain the user's CV, extracted profile, and
-match history under a clear retention policy with user controls.
+Before using the matcher beyond this proof of concept, the following improvements should be
+made:
 
-The original CV would be retained as well as the derived profile. If extraction,
-standardization, or matching improves later, the system can reprocess the true source
-rather than relying on an older interpretation.
+- **Match qualifications and licences:** Standardize required qualifications, certifications,
+  and professional licences so regulated roles cannot match candidates who do not have the
+  required credential.
+- **Measure relevant experience:** Continue to ignore unreliable job titles, but connect years
+  of experience to the skills or work domain in which that experience was gained. Unrelated
+  employment time should not satisfy a role's experience requirement.
+- **Strengthen evidence validation:** Verify score-driving details such as employment dates,
+  current-role status, and country directly against the CV instead of relying only on a nearby
+  title, company, or model-proposed quote.
+- **Support common CV layouts:** Ground related information across adjacent paragraphs and
+  table cells so a title, employer, and dates on separate lines still form one employment
+  record.
+- **Improve service readiness and uploads:** Keep new sessions queued while model services are
+  starting, use controlled retry delays, align the web-server upload limit with the API's 10 MB
+  limit, and return clear errors for documents that exceed the model's context capacity.
 
-## Future updates
-
-- OCR for scanned CVs.
-- A labelled mapping evaluation before enlarging the ESCO and O*NET catalogues or changing
-  the Arctic similarity and ambiguity cutoffs.
-- More detailed location rules, including remote, distance, visa, and relocation needs.
-- Matching of certifications, licences, and professional qualifications. They are extracted
-  now but are outside POC matching; production should enforce them where a role requires one.
-- A broader cross-sector skill catalogue. The current 56 concepts cover this fixed dataset,
-  not the whole labour market.
-- Authenticated profiles, retention controls, and deletion/export tools.
-- Automated job ingestion from employer feeds or submitted adverts, including validation,
-  deduplication, standardization, provenance, and update/expiry handling.
-- A labelled quality evaluation before changing the exact-match policy.
-- Complete the separately pinned scoring review covering required/preferred weighting,
-  validation of the initial category weights, and the overall normalized percentage.
-- Review the Arctic similarity and ambiguity thresholds with labelled examples.
-
-Country-level location and top-level NAICS industry are accepted POC simplifications.
-Production should add detailed location, remote/visa rules, and more precise industry logic.
-
-### O*NET attribution
-
-This product includes information from the O*NET 30.3 Database by the U.S. Department of
-Labor, Employment and Training Administration (USDOL/ETA), used under
-[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). O*NET® is a trademark of
-USDOL/ETA. Job Matcher added aliases and UUID identities; USDOL/ETA has not approved,
-endorsed, or tested those changes.
+These changes preserve the current simple workflow while improving the accuracy, reliability,
+and credibility of the matches.
